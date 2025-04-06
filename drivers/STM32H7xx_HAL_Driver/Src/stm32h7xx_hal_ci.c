@@ -17,6 +17,9 @@ GPIO_TypeDef* GPIOF = NULL;
 GPIO_TypeDef* GPIOG = NULL;
 GPIO_TypeDef* GPIOH = NULL;
 
+/* FMC instance for CI build */
+FMC_Bank1_TypeDef* FMC_Bank1_R = NULL;
+
 /* HAL variables */
 volatile uint32_t uwTick = 0;
 uint32_t uwTickPrio = 0;
@@ -296,20 +299,22 @@ void HAL_EXTI_D2_ClearFlag(uint32_t EXTI_Line)
 /**
  * @brief  Configure the EXTI event input for D1 domain.
  * @param  EXTI_Line: EXTI line
+ * @param  EXTI_Mode: EXTI mode
  * @param  EXTI_LineCmd: EXTI line command
  * @retval None
  */
-void HAL_EXTI_D1_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_LineCmd)
+void HAL_EXTI_D1_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_Mode, uint32_t EXTI_LineCmd)
 {
 }
 
 /**
  * @brief  Configure the EXTI event input for D2 domain.
  * @param  EXTI_Line: EXTI line
+ * @param  EXTI_Mode: EXTI mode
  * @param  EXTI_LineCmd: EXTI line command
  * @retval None
  */
-void HAL_EXTI_D2_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_LineCmd)
+void HAL_EXTI_D2_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_Mode, uint32_t EXTI_LineCmd)
 {
 }
 
