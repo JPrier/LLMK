@@ -15,6 +15,9 @@ set(CMAKE_OBJCOPY ${ARM_OBJCOPY})
 set(CMAKE_SIZE ${ARM_SIZE})
 set(CMAKE_GDB ${ARM_GDB})
 
+# Don't run the linker on compiler check
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
 # Don't look for programs on the host
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
