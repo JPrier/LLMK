@@ -70,6 +70,12 @@ typedef struct {
 #define GPIO_PIN_RESET 0
 #define GPIO_PIN_SET   1
 
+/* EXTI Mode definitions */
+#define EXTI_MODE_NONE        0x00000000U
+#define EXTI_MODE_IT          0x00000001U
+#define EXTI_MODE_EVT         0x00000002U
+#define EXTI_MODE_IT_EVT      (EXTI_MODE_IT | EXTI_MODE_EVT)
+
 /* EXTI Edge definitions */
 #define EXTI_RISING_EDGE      0x00000001U
 #define EXTI_FALLING_EDGE     0x00000002U
@@ -99,6 +105,10 @@ typedef struct {
 #define EXTI_D3_CLEAR_RTC     0x00000002U
 #define EXTI_D3_CLEAR_LPTIM1  0x00000003U
 
+/* EXTI Line Command definitions */
+#define EXTI_DISABLE          0x00000000U
+#define EXTI_ENABLE           0x00000001U
+
 /* Define some GPIO pins for CI build */
 #define GPIO_PIN_0  ((uint16_t)0x0001)
 #define GPIO_PIN_1  ((uint16_t)0x0002)
@@ -127,11 +137,46 @@ typedef struct
   volatile uint32_t FTSR1;       /* EXTI Falling trigger selection register 1 */
   volatile uint32_t SWIER1;      /* EXTI Software interrupt event register 1 */
   volatile uint32_t PR1;         /* EXTI Pending register 1 */
+  volatile uint32_t IMR2;        /* EXTI Interrupt mask register 2 */
+  volatile uint32_t EMR2;        /* EXTI Event mask register 2 */
+  volatile uint32_t RTSR2;       /* EXTI Rising trigger selection register 2 */
+  volatile uint32_t FTSR2;       /* EXTI Falling trigger selection register 2 */
+  volatile uint32_t SWIER2;      /* EXTI Software interrupt event register 2 */
+  volatile uint32_t PR2;         /* EXTI Pending register 2 */
+  volatile uint32_t D3PMR1;      /* EXTI D3 pending mask register 1 */
+  volatile uint32_t D3PCR1L;     /* EXTI D3 pending clear register 1 low */
+  volatile uint32_t D3PCR1H;     /* EXTI D3 pending clear register 1 high */
 } EXTI_TypeDef;
 
 /* Define EXTI base address for CI build */
 #define D3_APB1PERIPH_BASE       (0x58000000UL)
 #define EXTI_BASE                (D3_APB1PERIPH_BASE + 0x0000UL)
+
+/* Define EXTI pointers for CI build */
+#define EXTI                     ((EXTI_TypeDef *) EXTI_BASE)
+#define EXTI_D1                  ((EXTI_TypeDef *) EXTI_BASE)
+#define EXTI_D2                  ((EXTI_TypeDef *) EXTI_BASE)
+#define EXTI_D3                  ((EXTI_TypeDef *) EXTI_BASE)
+
+/* Define validation macros for CI build */
+#define IS_EXTI_MODE_LINE(MODE)  (((MODE) == EXTI_MODE_NONE) || \
+                                  ((MODE) == EXTI_MODE_IT)   || \
+                                  ((MODE) == EXTI_MODE_EVT)  || \
+                                  ((MODE) == EXTI_MODE_IT_EVT))
+
+#define IS_EXTI_D3_LINE(LINE)    (((LINE) == EXTI_LINE0) || ((LINE) == EXTI_LINE1) || \
+                                  ((LINE) == EXTI_LINE2) || ((LINE) == EXTI_LINE3) || \
+                                  ((LINE) == EXTI_LINE4) || ((LINE) == EXTI_LINE5) || \
+                                  ((LINE) == EXTI_LINE6) || ((LINE) == EXTI_LINE7) || \
+                                  ((LINE) == EXTI_LINE8) || ((LINE) == EXTI_LINE9) || \
+                                  ((LINE) == EXTI_LINE10) || ((LINE) == EXTI_LINE11) || \
+                                  ((LINE) == EXTI_LINE12) || ((LINE) == EXTI_LINE13) || \
+                                  ((LINE) == EXTI_LINE14) || ((LINE) == EXTI_LINE15))
+
+#define IS_EXTI_D3_CLEAR(CLEAR)  (((CLEAR) == EXTI_D3_CLEAR_NONE) || \
+                                  ((CLEAR) == EXTI_D3_CLEAR_EXTI) || \
+                                  ((CLEAR) == EXTI_D3_CLEAR_RTC)  || \
+                                  ((CLEAR) == EXTI_D3_CLEAR_LPTIM1))
 
 /* External variables */
 extern volatile uint32_t uwTick;
