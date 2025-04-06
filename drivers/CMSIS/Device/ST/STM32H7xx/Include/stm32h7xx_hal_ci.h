@@ -25,6 +25,23 @@ extern "C" {
 /* NVIC PRIO bits definition */
 #define __NVIC_PRIO_BITS          4U
 
+/* IRQn definitions */
+typedef enum
+{
+  NonMaskableInt_IRQn         = -14,    /* 2 Non Maskable Interrupt */
+  HardFault_IRQn              = -13,    /* 3 Cortex-M Hard Fault Interrupt */
+  MemoryManagement_IRQn       = -12,    /* 4 Cortex-M Memory Management Interrupt */
+  BusFault_IRQn               = -11,    /* 5 Cortex-M Bus Fault Interrupt */
+  UsageFault_IRQn             = -10,    /* 6 Cortex-M Usage Fault Interrupt */
+  SVCall_IRQn                 = -5,     /* 11 Cortex-M SV Call Interrupt */
+  DebugMonitor_IRQn           = -4,     /* 12 Cortex-M Debug Monitor Interrupt */
+  PendSV_IRQn                 = -2,     /* 14 Cortex-M Pend SV Interrupt */
+  SysTick_IRQn                = -1,     /* 15 Cortex-M System Tick Interrupt */
+} IRQn_Type;
+
+/* Exported macro ------------------------------------------------------------*/
+#define HAL_MAX_DELAY      0xFFFFFFFFU
+
 /**
   * @brief  HAL Status structures definition
   */
@@ -236,6 +253,29 @@ typedef struct {
 
 /* UID base address definition */
 #define UID_BASE                0x1FF1E800UL   /* Unique device ID register base address */
+
+/* Define SysTick for CI build */
+typedef struct
+{
+  volatile uint32_t CTRL;
+  volatile uint32_t LOAD;
+  volatile uint32_t VAL;
+  volatile const uint32_t CALIB;
+} SysTick_Type;
+
+/* Memory mapping of Core Hardware */
+#define SysTick_BASE        (0xE000E010UL)
+#define SysTick             ((SysTick_Type *)SysTick_BASE)
+
+/* SysTick definitions */
+#define SysTick_CTRL_COUNTFLAG_Pos         16U
+#define SysTick_CTRL_COUNTFLAG_Msk         (1UL << SysTick_CTRL_COUNTFLAG_Pos)
+#define SysTick_CTRL_CLKSOURCE_Pos          2U
+#define SysTick_CTRL_CLKSOURCE_Msk         (1UL << SysTick_CTRL_CLKSOURCE_Pos)
+#define SysTick_CTRL_TICKINT_Pos            1U
+#define SysTick_CTRL_TICKINT_Msk           (1UL << SysTick_CTRL_TICKINT_Pos)
+#define SysTick_CTRL_ENABLE_Pos             0U
+#define SysTick_CTRL_ENABLE_Msk            (1UL << SysTick_CTRL_ENABLE_Pos)
 
 /* DBGMCU CR register bit definitions */
 #define DBGMCU_CR_DBG_SLEEPD1       0x00000001U
