@@ -15,6 +15,10 @@ set(CMAKE_OBJCOPY ${ARM_OBJCOPY})
 set(CMAKE_SIZE ${ARM_SIZE})
 set(CMAKE_GDB ${ARM_GDB})
 
+# Skip compiler test for cross-compilation
+set(CMAKE_C_COMPILER_WORKS 1)
+set(CMAKE_CXX_COMPILER_WORKS 1)
+
 # Don't look for programs on the host
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
