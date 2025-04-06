@@ -348,6 +348,44 @@ typedef struct {
 #define IS_SYSCFG_CODE_SELECT(CODE) (((CODE) == SYSCFG_CCCSR_CS) || ((CODE) == 0x00000000U))
 #define IS_SYSCFG_CODE_CONFIG(CODE) ((CODE) <= 0x0FU)
 
+/* VREFBUF definitions for CI build */
+typedef struct {
+  volatile uint32_t CSR;         /* VREFBUF control and status register */
+  volatile uint32_t CCR;         /* VREFBUF calibration and control register */
+} VREFBUF_TypeDef;
+
+#define VREFBUF_BASE              (APB3PERIPH_BASE + 0x0F00UL)
+#define VREFBUF                   ((VREFBUF_TypeDef *)VREFBUF_BASE)
+
+/* VREFBUF CSR register bit definitions */
+#define VREFBUF_CSR_ENVR          0x00000001U
+#define VREFBUF_CSR_HIZ           0x00000002U
+#define VREFBUF_CSR_VRR           0x00000008U
+#define VREFBUF_CSR_VRS           0x00000010U
+
+/* VREFBUF CCR register bit definitions */
+#define VREFBUF_CCR_TRIM          0x0000003FU
+
+/* SYSCFG PMCR register bit definitions for analog switch */
+#define SYSCFG_PMCR_BOOSTEN       0x00000100U
+#define SYSCFG_PMCR_ANASWVDD      0x00010000U
+#define SYSCFG_PMCR_ANA1SWVDD     0x00020000U
+#define SYSCFG_PMCR_ANA2SWVDD     0x00040000U
+#define SYSCFG_PMCR_ANASWVDD_PD   0x00100000U
+#define SYSCFG_PMCR_ANA1SWVDD_PD  0x00200000U
+#define SYSCFG_PMCR_ANA2SWVDD_PD  0x00400000U
+
+/* SYSCFG validation macros for VREFBUF and analog switch */
+#define IS_SYSCFG_VREFBUF_TRIMMING(VALUE) ((VALUE) <= 0x3FU)
+#define IS_SYSCFG_VREFBUF_HIGH_IMPEDANCE(VALUE) (((VALUE) == SYSCFG_PMCR_BOOSTEN) || ((VALUE) == 0x00000000U))
+#define IS_SYSCFG_VREFBUF_VOLTAGE_SCALE(VALUE) (((VALUE) == SYSCFG_PMCR_BOOSTEN) || ((VALUE) == 0x00000000U))
+
+#define IS_SYSCFG_ANALOG_SWITCH(VALUE) (((VALUE) == SYSCFG_PMCR_ANASWVDD) || \
+                                        ((VALUE) == SYSCFG_PMCR_ANA1SWVDD) || \
+                                        ((VALUE) == SYSCFG_PMCR_ANA2SWVDD))
+
+#define IS_SYSCFG_SWITCH_STATE(VALUE) (((VALUE) == 0x00000000U) || ((VALUE) == 0x00000001U))
+
 /* System clock variables */
 extern uint32_t SystemCoreClock;
 extern uint32_t SystemD2Clock;
