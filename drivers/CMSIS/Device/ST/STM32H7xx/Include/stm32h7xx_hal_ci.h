@@ -316,6 +316,38 @@ typedef struct {
 #define RCC_CDCFGR1_HPRE          0x000000F0U
 #define RCC_CDCFGR1_HPRE_Pos      4U
 
+/* SYSCFG definitions for CI build */
+typedef struct {
+  volatile uint32_t PMCR;         /* SYSCFG power management control register */
+  volatile uint32_t EXTICR[4];    /* SYSCFG external interrupt configuration registers */
+  volatile uint32_t CFGR;         /* SYSCFG configuration register */
+  volatile uint32_t CCCSR;        /* SYSCFG compensation cell control and status register */
+  volatile uint32_t CCVR;         /* SYSCFG compensation cell value register */
+  volatile uint32_t CCCR;         /* SYSCFG compensation cell code register */
+} SYSCFG_TypeDef;
+
+#define PERIPH_BASE              (0x40000000UL)
+#define APB3PERIPH_BASE          (PERIPH_BASE + 0x10000000UL)
+#define SYSCFG_BASE              (APB3PERIPH_BASE + 0x0000UL)
+#define SYSCFG                   ((SYSCFG_TypeDef *)SYSCFG_BASE)
+
+/* SYSCFG CCCSR register bit definitions */
+#define SYSCFG_CCCSR_EN          0x00000001U
+#define SYSCFG_CCCSR_CS          0x00000002U
+#define SYSCFG_CCCSR_READY       0x00000004U
+#define SYSCFG_CCCSR_HSLV0       0x00000010U
+#define SYSCFG_CCCSR_HSLV1       0x00000020U
+#define SYSCFG_CCCSR_HSLV2       0x00000040U
+#define SYSCFG_CCCSR_HSLV3       0x00000080U
+
+/* SYSCFG CCCR register bit definitions */
+#define SYSCFG_CCCR_NCC          0x0000000FU
+#define SYSCFG_CCCR_PCC          0x000000F0U
+
+/* SYSCFG validation macros */
+#define IS_SYSCFG_CODE_SELECT(CODE) (((CODE) == SYSCFG_CCCSR_CS) || ((CODE) == 0x00000000U))
+#define IS_SYSCFG_CODE_CONFIG(CODE) ((CODE) <= 0x0FU)
+
 /* System clock variables */
 extern uint32_t SystemCoreClock;
 extern uint32_t SystemD2Clock;
