@@ -50,9 +50,9 @@ HAL_StatusTypeDef HAL_Init(void)
 
 /**
  * @brief  DeInitialize the HAL Library.
- * @retval None
+ * @retval HAL status
  */
-void HAL_DeInit(void)
+HAL_StatusTypeDef HAL_DeInit(void)
 {
   /* Reset of all peripherals */
   __HAL_RCC_APB1L_FORCE_RESET();
@@ -79,6 +79,8 @@ void HAL_DeInit(void)
     
   /* Return to default Tick Freq */
   uwTickFreq = HAL_TICK_FREQ_DEFAULT;
+  
+  return HAL_OK;
 }
 
 /**
