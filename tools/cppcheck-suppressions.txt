@@ -1,0 +1,4 @@
+# Suppress warnings from HAL library
+missingIncludeSystem
+unusedFunction:*/drivers/*
+*:*/drivers/*

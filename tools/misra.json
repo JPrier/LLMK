@@ -1,0 +1,14 @@
+{
+  "script": "misra.py",
+  "args": [
+    "--rule-texts=misra-c-2012-rules.txt",
+    "--suppressions-list=misra-suppressions.txt"
+  ],
+  "addon": "misra",
+  "rule-texts": "misra-c-2012-rules.txt",
+  "suppressions-list": "misra-suppressions.txt",
+  "results-file": "cppcheck-misra-results.txt",
+  "rules": [
+    "required"
+  ]
+}

@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install ARM GCC Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi cmake
+    
+    - name: Build Firmware
+      run: |
+        mkdir -p build
+        cd build
+        cmake ..
+        make
+    
+    - name: Upload Firmware Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: firmware
+        path: |
+          build/*.hex
+          build/*.bin
+  
+  static-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Cppcheck
+      run: sudo apt-get install -y cppcheck
+    
+    - name: Run Cppcheck
+      run: |
+        mkdir -p build
+        cd build
+        cmake ..
+        make cppcheck
+    
+    - name: Upload Analysis Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: static-analysis
+        path: build/cppcheck-result.xml
