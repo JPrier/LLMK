@@ -53,6 +53,12 @@ add_definitions(
     -DUSE_HAL_DRIVER
 )
 
+# Define CI_BUILD for GitHub Actions
+if(DEFINED ENV{CI})
+    add_definitions(-DCI_BUILD)
+    message(STATUS "Building in CI environment")
+endif()
+
 # Source files
 file(GLOB_RECURSE SOURCES
     "src/*.c"

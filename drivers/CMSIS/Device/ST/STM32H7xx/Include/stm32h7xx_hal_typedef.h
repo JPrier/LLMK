@@ -1,16 +1,12 @@
 /**
   ******************************************************************************
   * @file    stm32h7xx_hal_typedef.h
-  * @brief   HAL Type definitions for STM32H7xx series.
+  * @brief   HAL Type definitions for STM32H7xx series (CI build only).
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
+  * This file is only used for CI builds and contains simplified type definitions.
+  * For local builds, the actual STM32 HAL headers are used instead.
   *
   ******************************************************************************
   */
@@ -26,23 +22,15 @@
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
 
-/* IO definitions */
-#ifdef __cplusplus
-  #define   __I     volatile             /*!< Defines 'read only' permissions                 */
-#else
-  #define   __I     volatile const       /*!< Defines 'read only' permissions                 */
+/* This file is only used for CI builds */
+#ifndef CI_BUILD
+#error "This file should only be included in CI builds"
 #endif
-#define     __O     volatile             /*!< Defines 'write only' permissions                */
-#define     __IO    volatile             /*!< Defines 'read / write' permissions              */
 
-/* Compiler specific definitions */
-#if defined ( __CC_ARM )
-  #define __weak                                   __attribute__((weak))
-#elif defined ( __ICCARM__ )
-  #define __weak                                   __weak
-#elif defined ( __GNUC__ )
-  #define __weak                                   __attribute__((weak))
-#endif
+/* IO definitions */
+#define __I     volatile const       /* 'read only' permissions */
+#define __O     volatile             /* 'write only' permissions */
+#define __IO    volatile             /* 'read / write' permissions */
 
 /* NVIC PRIO bits definition */
 #define __NVIC_PRIO_BITS          4U
@@ -79,26 +67,21 @@ typedef enum
 } HAL_TickFreqTypeDef;
 
 /* NVIC definitions */
-#define NVIC_PRIORITYGROUP_0         0x00000007U /*!< 0 bits for pre-emption priority
-                                                      4 bits for subpriority */
-#define NVIC_PRIORITYGROUP_1         0x00000006U /*!< 1 bits for pre-emption priority
-                                                      3 bits for subpriority */
-#define NVIC_PRIORITYGROUP_2         0x00000005U /*!< 2 bits for pre-emption priority
-                                                      2 bits for subpriority */
-#define NVIC_PRIORITYGROUP_3         0x00000004U /*!< 3 bits for pre-emption priority
-                                                      1 bits for subpriority */
-#define NVIC_PRIORITYGROUP_4         0x00000003U /*!< 4 bits for pre-emption priority
-                                                      0 bits for subpriority */
+#define NVIC_PRIORITYGROUP_0         0x00000007U /* 0 bits for pre-emption priority, 4 bits for subpriority */
+#define NVIC_PRIORITYGROUP_1         0x00000006U /* 1 bits for pre-emption priority, 3 bits for subpriority */
+#define NVIC_PRIORITYGROUP_2         0x00000005U /* 2 bits for pre-emption priority, 2 bits for subpriority */
+#define NVIC_PRIORITYGROUP_3         0x00000004U /* 3 bits for pre-emption priority, 1 bits for subpriority */
+#define NVIC_PRIORITYGROUP_4         0x00000003U /* 4 bits for pre-emption priority, 0 bits for subpriority */
 
 /* SysTick definitions */
-#define SysTick_CTRL_COUNTFLAG_Pos         16U                                            /*!< SysTick CTRL: COUNTFLAG Position */
-#define SysTick_CTRL_COUNTFLAG_Msk         (1UL << SysTick_CTRL_COUNTFLAG_Pos)            /*!< SysTick CTRL: COUNTFLAG Mask */
-#define SysTick_CTRL_CLKSOURCE_Pos          2U                                            /*!< SysTick CTRL: CLKSOURCE Position */
-#define SysTick_CTRL_CLKSOURCE_Msk         (1UL << SysTick_CTRL_CLKSOURCE_Pos)            /*!< SysTick CTRL: CLKSOURCE Mask */
-#define SysTick_CTRL_TICKINT_Pos            1U                                            /*!< SysTick CTRL: TICKINT Position */
-#define SysTick_CTRL_TICKINT_Msk           (1UL << SysTick_CTRL_TICKINT_Pos)              /*!< SysTick CTRL: TICKINT Mask */
-#define SysTick_CTRL_ENABLE_Pos             0U                                            /*!< SysTick CTRL: ENABLE Position */
-#define SysTick_CTRL_ENABLE_Msk            (1UL << SysTick_CTRL_ENABLE_Pos)               /*!< SysTick CTRL: ENABLE Mask */
+#define SysTick_CTRL_COUNTFLAG_Pos         16U
+#define SysTick_CTRL_COUNTFLAG_Msk         (1UL << SysTick_CTRL_COUNTFLAG_Pos)
+#define SysTick_CTRL_CLKSOURCE_Pos          2U
+#define SysTick_CTRL_CLKSOURCE_Msk         (1UL << SysTick_CTRL_CLKSOURCE_Pos)
+#define SysTick_CTRL_TICKINT_Pos            1U
+#define SysTick_CTRL_TICKINT_Msk           (1UL << SysTick_CTRL_TICKINT_Pos)
+#define SysTick_CTRL_ENABLE_Pos             0U
+#define SysTick_CTRL_ENABLE_Msk            (1UL << SysTick_CTRL_ENABLE_Pos)
 
 /* Exported macro ------------------------------------------------------------*/
 #define HAL_MAX_DELAY      0xFFFFFFFFU
@@ -139,41 +122,41 @@ typedef struct
 /* IRQn definitions */
 typedef enum
 {
-  NonMaskableInt_IRQn         = -14,    /*!< 2 Non Maskable Interrupt                                          */
-  HardFault_IRQn              = -13,    /*!< 3 Cortex-M Hard Fault Interrupt                                   */
-  MemoryManagement_IRQn       = -12,    /*!< 4 Cortex-M Memory Management Interrupt                            */
-  BusFault_IRQn               = -11,    /*!< 5 Cortex-M Bus Fault Interrupt                                    */
-  UsageFault_IRQn             = -10,    /*!< 6 Cortex-M Usage Fault Interrupt                                  */
-  SVCall_IRQn                 = -5,     /*!< 11 Cortex-M SV Call Interrupt                                     */
-  DebugMonitor_IRQn           = -4,     /*!< 12 Cortex-M Debug Monitor Interrupt                               */
-  PendSV_IRQn                 = -2,     /*!< 14 Cortex-M Pend SV Interrupt                                     */
-  SysTick_IRQn                = -1,     /*!< 15 Cortex-M System Tick Interrupt                                 */
+  NonMaskableInt_IRQn         = -14,    /* 2 Non Maskable Interrupt */
+  HardFault_IRQn              = -13,    /* 3 Cortex-M Hard Fault Interrupt */
+  MemoryManagement_IRQn       = -12,    /* 4 Cortex-M Memory Management Interrupt */
+  BusFault_IRQn               = -11,    /* 5 Cortex-M Bus Fault Interrupt */
+  UsageFault_IRQn             = -10,    /* 6 Cortex-M Usage Fault Interrupt */
+  SVCall_IRQn                 = -5,     /* 11 Cortex-M SV Call Interrupt */
+  DebugMonitor_IRQn           = -4,     /* 12 Cortex-M Debug Monitor Interrupt */
+  PendSV_IRQn                 = -2,     /* 14 Cortex-M Pend SV Interrupt */
+  SysTick_IRQn                = -1,     /* 15 Cortex-M System Tick Interrupt */
 } IRQn_Type;
 
 /* DBGMCU definition for CI build */
 typedef struct
 {
-  volatile uint32_t CR;        /*!< Debug MCU configuration register,    Address offset: 0x00 */
-  volatile uint32_t APB3FZ1;   /*!< Debug MCU APB3 freeze register 1,    Address offset: 0x04 */
-  volatile uint32_t APB1LFZ1;  /*!< Debug MCU APB1L freeze register 1,   Address offset: 0x08 */
-  volatile uint32_t APB1HFZ1;  /*!< Debug MCU APB1H freeze register 1,   Address offset: 0x0C */
-  volatile uint32_t APB2FZ1;   /*!< Debug MCU APB2 freeze register 1,    Address offset: 0x10 */
-  volatile uint32_t APB4FZ1;   /*!< Debug MCU APB4 freeze register 1,    Address offset: 0x14 */
-  uint32_t      RESERVED1[2];  /*!< Reserved, 0x18-0x1C                                       */
-  volatile uint32_t APB3FZ2;   /*!< Debug MCU APB3 freeze register 2,    Address offset: 0x20 */
-  volatile uint32_t APB1LFZ2;  /*!< Debug MCU APB1L freeze register 2,   Address offset: 0x24 */
-  volatile uint32_t APB1HFZ2;  /*!< Debug MCU APB1H freeze register 2,   Address offset: 0x28 */
-  volatile uint32_t APB2FZ2;   /*!< Debug MCU APB2 freeze register 2,    Address offset: 0x2C */
-  volatile uint32_t APB4FZ2;   /*!< Debug MCU APB4 freeze register 2,    Address offset: 0x30 */
-  uint32_t      RESERVED2[2];  /*!< Reserved, 0x34-0x38                                       */
-  volatile uint32_t IDCODE;    /*!< MCU device ID code,                  Address offset: 0x3C */
+  volatile uint32_t CR;        /* Debug MCU configuration register,    Address offset: 0x00 */
+  volatile uint32_t APB3FZ1;   /* Debug MCU APB3 freeze register 1,    Address offset: 0x04 */
+  volatile uint32_t APB1LFZ1;  /* Debug MCU APB1L freeze register 1,   Address offset: 0x08 */
+  volatile uint32_t APB1HFZ1;  /* Debug MCU APB1H freeze register 1,   Address offset: 0x0C */
+  volatile uint32_t APB2FZ1;   /* Debug MCU APB2 freeze register 1,    Address offset: 0x10 */
+  volatile uint32_t APB4FZ1;   /* Debug MCU APB4 freeze register 1,    Address offset: 0x14 */
+  uint32_t      RESERVED1[2];  /* Reserved, 0x18-0x1C */
+  volatile uint32_t APB3FZ2;   /* Debug MCU APB3 freeze register 2,    Address offset: 0x20 */
+  volatile uint32_t APB1LFZ2;  /* Debug MCU APB1L freeze register 2,   Address offset: 0x24 */
+  volatile uint32_t APB1HFZ2;  /* Debug MCU APB1H freeze register 2,   Address offset: 0x28 */
+  volatile uint32_t APB2FZ2;   /* Debug MCU APB2 freeze register 2,    Address offset: 0x2C */
+  volatile uint32_t APB4FZ2;   /* Debug MCU APB4 freeze register 2,    Address offset: 0x30 */
+  uint32_t      RESERVED2[2];  /* Reserved, 0x34-0x38 */
+  volatile uint32_t IDCODE;    /* MCU device ID code,                  Address offset: 0x3C */
 } DBGMCU_TypeDef;
 
 #define DBGMCU_BASE             (0x5C001000UL)
 #define DBGMCU                  ((DBGMCU_TypeDef *)DBGMCU_BASE)
 
 /* UID base address definition */
-#define UID_BASE                0x1FF1E800UL   /*!< Unique device ID register base address */
+#define UID_BASE                0x1FF1E800UL   /* Unique device ID register base address */
 
 #ifdef __cplusplus
 }
