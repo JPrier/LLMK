@@ -234,6 +234,9 @@ typedef struct {
 #define DBGMCU_BASE             (0x5C001000UL)
 #define DBGMCU                  ((DBGMCU_TypeDef *)DBGMCU_BASE)
 
+/* UID base address definition */
+#define UID_BASE                0x1FF1E800UL   /* Unique device ID register base address */
+
 /* DBGMCU CR register bit definitions */
 #define DBGMCU_CR_DBG_SLEEPD1       0x00000001U
 #define DBGMCU_CR_DBG_STOPD1        0x00000002U
@@ -386,6 +389,14 @@ typedef struct {
 
 #define IS_SYSCFG_SWITCH_STATE(VALUE) (((VALUE) == 0x00000000U) || ((VALUE) == 0x00000001U))
 
+/* HAL validation macros */
+#define IS_TICKFREQ(FREQ) (((FREQ) == HAL_TICK_FREQ_10HZ)  || \
+                           ((FREQ) == HAL_TICK_FREQ_100HZ) || \
+                           ((FREQ) == HAL_TICK_FREQ_1KHZ))
+
+/* Assert macros */
+#define assert_param(expr) ((void)0U)
+
 /* System clock variables */
 extern uint32_t SystemCoreClock;
 extern uint32_t SystemD2Clock;
@@ -431,7 +442,7 @@ extern GPIO_TypeDef* GPIOH;
 
 /* Function prototypes */
 HAL_StatusTypeDef HAL_Init(void);
-void HAL_DeInit(void);
+HAL_StatusTypeDef HAL_DeInit(void);
 void HAL_MspInit(void);
 void HAL_MspDeInit(void);
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority);
