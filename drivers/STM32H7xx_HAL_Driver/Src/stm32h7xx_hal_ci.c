@@ -25,12 +25,26 @@ volatile uint32_t uwTick = 0;
 uint32_t uwTickPrio = 0;
 HAL_TickFreqTypeDef uwTickFreq = HAL_TICK_FREQ_DEFAULT;
 
+/* System clock variables */
+uint32_t SystemCoreClock = 550000000U; /* Default to 550 MHz */
+uint32_t SystemD2Clock = 275000000U;   /* Default to 275 MHz */
+const uint8_t D1CorePrescTable[16] = {0, 0, 0, 0, 1, 2, 3, 4, 1, 2, 3, 4, 6, 7, 8, 9};
+
 /**
  * @brief  Initialize the HAL Library.
  * @retval HAL status
  */
 HAL_StatusTypeDef HAL_Init(void)
 {
+  /* Set Interrupt Group Priority */
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+  
+  /* Use SysTick as time base source and configure 1ms tick */
+  HAL_InitTick(TICK_INT_PRIORITY);
+  
+  /* Init the low level hardware */
+  HAL_MspInit();
+  
   return HAL_OK;
 }
 
@@ -40,6 +54,31 @@ HAL_StatusTypeDef HAL_Init(void)
  */
 void HAL_DeInit(void)
 {
+  /* Reset of all peripherals */
+  __HAL_RCC_APB1L_FORCE_RESET();
+  __HAL_RCC_APB1L_RELEASE_RESET();
+  __HAL_RCC_APB1H_FORCE_RESET();
+  __HAL_RCC_APB1H_RELEASE_RESET();
+  __HAL_RCC_APB2_FORCE_RESET();
+  __HAL_RCC_APB2_RELEASE_RESET();
+  __HAL_RCC_APB3_FORCE_RESET();
+  __HAL_RCC_APB3_RELEASE_RESET();
+  __HAL_RCC_APB4_FORCE_RESET();
+  __HAL_RCC_APB4_RELEASE_RESET();
+  __HAL_RCC_AHB1_FORCE_RESET();
+  __HAL_RCC_AHB1_RELEASE_RESET();
+  __HAL_RCC_AHB2_FORCE_RESET();
+  __HAL_RCC_AHB2_RELEASE_RESET();
+  __HAL_RCC_AHB3_FORCE_RESET();
+  __HAL_RCC_AHB3_RELEASE_RESET();
+  __HAL_RCC_AHB4_FORCE_RESET();
+  __HAL_RCC_AHB4_RELEASE_RESET();
+
+  /* De-Init the low level hardware */
+  HAL_MspDeInit();
+    
+  /* Return to default Tick Freq */
+  uwTickFreq = HAL_TICK_FREQ_DEFAULT;
 }
 
 /**
@@ -197,6 +236,15 @@ uint32_t HAL_GetUIDw1(void)
 uint32_t HAL_GetUIDw2(void)
 {
   return 0U;
+}
+
+/**
+ * @brief  Get system clock frequency.
+ * @retval System clock frequency
+ */
+uint32_t HAL_RCC_GetSysClockFreq(void)
+{
+  return SystemCoreClock;
 }
 
 /**
