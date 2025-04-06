@@ -68,7 +68,7 @@
 /** @defgroup HAL_Exported_Variables HAL Exported Variables
   * @{
   */
-__IO uint32_t uwTick;
+volatile uint32_t uwTick;
 uint32_t uwTickPrio   = (1UL << __NVIC_PRIO_BITS); /* Invalid PRIO */
 HAL_TickFreqTypeDef uwTickFreq = HAL_TICK_FREQ_DEFAULT;  /* 1KHz */
 /**
@@ -225,7 +225,7 @@ HAL_StatusTypeDef HAL_DeInit(void)
   * @brief  Initializes the MSP.
   * @retval None
   */
-__weak void HAL_MspInit(void)
+void HAL_MspInit(void)
 {
   /* NOTE : This function Should not be modified, when the callback is needed,
             the HAL_MspInit could be implemented in the user file
@@ -236,7 +236,7 @@ __weak void HAL_MspInit(void)
   * @brief  DeInitializes the MSP.
   * @retval None
   */
-__weak void HAL_MspDeInit(void)
+void HAL_MspDeInit(void)
 {
   /* NOTE : This function Should not be modified, when the callback is needed,
             the HAL_MspDeInit could be implemented in the user file
@@ -259,7 +259,7 @@ __weak void HAL_MspDeInit(void)
   * @param TickPriority: Tick interrupt priority.
   * @retval HAL status
   */
-__weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
+HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   /* Check uwTickFreq for MisraC 2012 (even if uwTickFreq is a enum type that don't take the value zero)*/
   if((uint32_t)uwTickFreq == 0UL)
@@ -324,7 +324,7 @@ __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   *      implementations in user file.
   * @retval None
   */
-__weak void HAL_IncTick(void)
+void HAL_IncTick(void)
 {
   uwTick += (uint32_t)uwTickFreq;
 }
@@ -335,7 +335,7 @@ __weak void HAL_IncTick(void)
   *       implementations in user file.
   * @retval tick value
   */
-__weak uint32_t HAL_GetTick(void)
+uint32_t HAL_GetTick(void)
 {
   return uwTick;
 }
@@ -401,7 +401,7 @@ HAL_TickFreqTypeDef HAL_GetTickFreq(void)
   * @param Delay  specifies the delay time length, in milliseconds.
   * @retval None
   */
-__weak void HAL_Delay(uint32_t Delay)
+void HAL_Delay(uint32_t Delay)
 {
   uint32_t tickstart = HAL_GetTick();
   uint32_t wait = Delay;
@@ -427,7 +427,7 @@ __weak void HAL_Delay(uint32_t Delay)
   *       implementations in user file.
   * @retval None
   */
-__weak void HAL_SuspendTick(void)
+void HAL_SuspendTick(void)
 {
   /* Disable SysTick Interrupt */
   SysTick->CTRL &= ~SysTick_CTRL_TICKINT_Msk;
@@ -443,7 +443,7 @@ __weak void HAL_SuspendTick(void)
   *       implementations in user file.
   * @retval None
   */
-__weak void HAL_ResumeTick(void)
+void HAL_ResumeTick(void)
 {
   /* Enable SysTick Interrupt */
   SysTick->CTRL  |= SysTick_CTRL_TICKINT_Msk;
@@ -1097,16 +1097,16 @@ void HAL_EXTI_EdgeConfig(uint32_t EXTI_Line , uint32_t EXTI_Edge )
   assert_param(IS_EXTI_EDGE_LINE(EXTI_Edge));
 
   /* Clear Rising Falling edge configuration */
-  CLEAR_BIT(*(__IO uint32_t *) (((uint32_t) &(EXTI->FTSR1)) + ((EXTI_Line >> 5 ) * 0x20UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
-  CLEAR_BIT( *(__IO uint32_t *) (((uint32_t) &(EXTI->RTSR1)) + ((EXTI_Line >> 5 ) * 0x20UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+  CLEAR_BIT(*((volatile uint32_t *) (((uint32_t) &(EXTI->FTSR1)) + ((EXTI_Line >> 5 ) * 0x20UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+  CLEAR_BIT(*((volatile uint32_t *) (((uint32_t) &(EXTI->RTSR1)) + ((EXTI_Line >> 5 ) * 0x20UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
 
   if( (EXTI_Edge & EXTI_RISING_EDGE) == EXTI_RISING_EDGE)
   {
-   SET_BIT( *(__IO uint32_t *) (((uint32_t) &(EXTI->RTSR1)) + ((EXTI_Line >> 5 ) * 0x20UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+   SET_BIT( *((volatile uint32_t *) (((uint32_t) &(EXTI->RTSR1)) + ((EXTI_Line >> 5 ) * 0x20UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
   }
   if( (EXTI_Edge & EXTI_FALLING_EDGE) == EXTI_FALLING_EDGE)
   {
-   SET_BIT(*(__IO uint32_t *) (((uint32_t) &(EXTI->FTSR1)) + ((EXTI_Line >> 5 ) * 0x20UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+   SET_BIT(*((volatile uint32_t *) (((uint32_t) &(EXTI->FTSR1)) + ((EXTI_Line >> 5 ) * 0x20UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
   }
 }
 
@@ -1121,7 +1121,7 @@ void HAL_EXTI_GenerateSWInterrupt(uint32_t EXTI_Line)
   /* Check the parameters */
   assert_param(IS_HAL_EXTI_CONFIG_LINE(EXTI_Line));
 
-  SET_BIT(*(__IO uint32_t *) (((uint32_t) &(EXTI->SWIER1)) + ((EXTI_Line >> 5 ) * 0x20UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+  SET_BIT(*((volatile uint32_t *) (((uint32_t) &(EXTI->SWIER1)) + ((EXTI_Line >> 5 ) * 0x20UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
 }
 
 
@@ -1135,7 +1135,7 @@ void HAL_EXTI_D1_ClearFlag(uint32_t EXTI_Line)
 {
   /* Check the parameters */
  assert_param(IS_EXTI_D1_LINE(EXTI_Line));
- WRITE_REG(*(__IO uint32_t *) (((uint32_t) &(EXTI_D1->PR1)) + ((EXTI_Line >> 5 ) * 0x10UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+ WRITE_REG(*((volatile uint32_t *) (((uint32_t) &(EXTI_D1->PR1)) + ((EXTI_Line >> 5 ) * 0x10UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
 
 }
 
@@ -1150,7 +1150,7 @@ void HAL_EXTI_D2_ClearFlag(uint32_t EXTI_Line)
 {
   /* Check the parameters */
  assert_param(IS_EXTI_D2_LINE(EXTI_Line));
- WRITE_REG(*(__IO uint32_t *) (((uint32_t) &(EXTI_D2->PR1)) + ((EXTI_Line >> 5 ) * 0x10UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+ WRITE_REG(*((volatile uint32_t *) (((uint32_t) &(EXTI_D2->PR1)) + ((EXTI_Line >> 5 ) * 0x10UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
 }
 
 #endif /*DUAL_CORE*/
@@ -1177,11 +1177,11 @@ void HAL_EXTI_D1_EventInputConfig(uint32_t EXTI_Line , uint32_t EXTI_Mode,  uint
      if( EXTI_LineCmd == 0UL)
      {
        /* Clear EXTI line configuration */
-        CLEAR_BIT(*(__IO uint32_t *) (((uint32_t) &(EXTI_D1->IMR1)) + ((EXTI_Line >> 5 ) * 0x10UL)),(uint32_t)(1UL << (EXTI_Line & 0x1FUL)) );
+        CLEAR_BIT(*((volatile uint32_t *) (((uint32_t) &(EXTI_D1->IMR1)) + ((EXTI_Line >> 5 ) * 0x10UL))),(uint32_t)(1UL << (EXTI_Line & 0x1FUL)) );
      }
      else
      {
-        SET_BIT(*(__IO uint32_t *) (((uint32_t) &(EXTI_D1->IMR1)) + ((EXTI_Line >> 5 ) * 0x10UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+        SET_BIT(*((volatile uint32_t *) (((uint32_t) &(EXTI_D1->IMR1)) + ((EXTI_Line >> 5 ) * 0x10UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
      }
   }
 
@@ -1190,11 +1190,11 @@ void HAL_EXTI_D1_EventInputConfig(uint32_t EXTI_Line , uint32_t EXTI_Mode,  uint
     if( EXTI_LineCmd == 0UL)
     {
       /* Clear EXTI line configuration */
-      CLEAR_BIT(  *(__IO uint32_t *) (((uint32_t) &(EXTI_D1->EMR1)) + ((EXTI_Line >> 5 ) * 0x10UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+      CLEAR_BIT(  *((volatile uint32_t *) (((uint32_t) &(EXTI_D1->EMR1)) + ((EXTI_Line >> 5 ) * 0x10UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
     }
     else
     {
-      SET_BIT(  *(__IO uint32_t *) (((uint32_t) &(EXTI_D1->EMR1)) + ((EXTI_Line >> 5 ) * 0x10UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+      SET_BIT(  *((volatile uint32_t *) (((uint32_t) &(EXTI_D1->EMR1)) + ((EXTI_Line >> 5 ) * 0x10UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
     }
   }
 }
@@ -1223,11 +1223,11 @@ void HAL_EXTI_D2_EventInputConfig(uint32_t EXTI_Line , uint32_t EXTI_Mode,  uint
     if( EXTI_LineCmd == 0UL)
     {
     /* Clear EXTI line configuration */
-     CLEAR_BIT(*(__IO uint32_t *) (((uint32_t) &(EXTI_D2->IMR1)) + ((EXTI_Line >> 5 ) * 0x10UL)),(uint32_t)(1UL << (EXTI_Line & 0x1FUL)) );
+     CLEAR_BIT(*((volatile uint32_t *) (((uint32_t) &(EXTI_D2->IMR1)) + ((EXTI_Line >> 5 ) * 0x10UL))),(uint32_t)(1UL << (EXTI_Line & 0x1FUL)) );
     }
     else
     {
-     SET_BIT(*(__IO uint32_t *) (((uint32_t) &(EXTI_D2->IMR1)) + ((EXTI_Line >> 5 ) * 0x10UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+     SET_BIT(*((volatile uint32_t *) (((uint32_t) &(EXTI_D2->IMR1)) + ((EXTI_Line >> 5 ) * 0x10UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
     }
   }
 
@@ -1236,11 +1236,11 @@ void HAL_EXTI_D2_EventInputConfig(uint32_t EXTI_Line , uint32_t EXTI_Mode,  uint
     if( EXTI_LineCmd == 0UL)
     {
       /* Clear EXTI line configuration */
-      CLEAR_BIT(  *(__IO uint32_t *) (((uint32_t) &(EXTI_D2->EMR1)) + ((EXTI_Line >> 5 ) * 0x10UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+      CLEAR_BIT(  *((volatile uint32_t *) (((uint32_t) &(EXTI_D2->EMR1)) + ((EXTI_Line >> 5 ) * 0x10UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
     }
     else
     {
-      SET_BIT(  *(__IO uint32_t *) (((uint32_t) &(EXTI_D2->EMR1)) + ((EXTI_Line >> 5 ) * 0x10UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+      SET_BIT(  *((volatile uint32_t *) (((uint32_t) &(EXTI_D2->EMR1)) + ((EXTI_Line >> 5 ) * 0x10UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
     }
   }
 }
@@ -1262,7 +1262,7 @@ void HAL_EXTI_D2_EventInputConfig(uint32_t EXTI_Line , uint32_t EXTI_Mode,  uint
   */
 void HAL_EXTI_D3_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_LineCmd , uint32_t EXTI_ClearSrc  )
 {
-  __IO uint32_t *pRegv;
+  volatile uint32_t *pRegv;
 
   /* Check the parameter */
   assert_param(IS_EXTI_D3_LINE(EXTI_Line));
@@ -1271,20 +1271,20 @@ void HAL_EXTI_D3_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_LineCmd , ui
   if( EXTI_LineCmd == 0UL)
   {
     /* Clear EXTI line configuration */
-    CLEAR_BIT(*(__IO uint32_t *) (((uint32_t) &(EXTI->D3PMR1)) + ((EXTI_Line >> 5 ) * 0x20UL)),(uint32_t)(1UL << (EXTI_Line & 0x1FUL)) );
+    CLEAR_BIT(*((volatile uint32_t *) (((uint32_t) &(EXTI->D3PMR1)) + ((EXTI_Line >> 5 ) * 0x20UL))),(uint32_t)(1UL << (EXTI_Line & 0x1FUL)) );
   }
   else
   {
-    SET_BIT(*(__IO uint32_t *) (((uint32_t) &(EXTI->D3PMR1)) +((EXTI_Line >> 5 ) * 0x20UL)), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
+    SET_BIT(*((volatile uint32_t *) (((uint32_t) &(EXTI->D3PMR1)) +((EXTI_Line >> 5 ) * 0x20UL))), (uint32_t)(1UL << (EXTI_Line & 0x1FUL)));
   }
 
   if(((EXTI_Line>>4)%2UL) == 0UL)
   {
-    pRegv = (__IO uint32_t *) (((uint32_t) &(EXTI->D3PCR1L)) + ((EXTI_Line >> 5 ) * 0x20UL));
+    pRegv = ((volatile uint32_t *) (((uint32_t) &(EXTI->D3PCR1L)) + ((EXTI_Line >> 5 ) * 0x20UL)));
   }
   else
   {
-    pRegv = (__IO uint32_t *) (((uint32_t) &(EXTI->D3PCR1H)) + ((EXTI_Line >> 5 ) * 0x20UL));
+    pRegv = ((volatile uint32_t *) (((uint32_t) &(EXTI->D3PCR1H)) + ((EXTI_Line >> 5 ) * 0x20UL)));
   }
   MODIFY_REG(*pRegv, (uint32_t)(3UL << ((EXTI_Line*2UL) & 0x1FUL)), (uint32_t)(EXTI_ClearSrc << ((EXTI_Line*2UL) & 0x1FUL)));
 

@@ -37,40 +37,38 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 
-/** 
-  * @brief  EXTI Registers structure definition
-  */
+/* EXTI Registers structure definition */
 typedef struct
 {
-  __IO uint32_t IMR1;        /*!< EXTI Interrupt mask register 1,             Address offset: 0x00 */
-  __IO uint32_t EMR1;        /*!< EXTI Event mask register 1,                 Address offset: 0x04 */
-  __IO uint32_t RTSR1;       /*!< EXTI Rising trigger selection register 1,   Address offset: 0x08 */
-  __IO uint32_t FTSR1;       /*!< EXTI Falling trigger selection register 1,  Address offset: 0x0C */
-  __IO uint32_t SWIER1;      /*!< EXTI Software interrupt event register 1,   Address offset: 0x10 */
-  __IO uint32_t PR1;         /*!< EXTI Pending register 1,                    Address offset: 0x14 */
-  uint32_t      RESERVED1;   /*!< Reserved, 0x18                                                   */
-  uint32_t      RESERVED2;   /*!< Reserved, 0x1C                                                   */
-  __IO uint32_t IMR2;        /*!< EXTI Interrupt mask register 2,             Address offset: 0x20 */
-  __IO uint32_t EMR2;        /*!< EXTI Event mask register 2,                 Address offset: 0x24 */
-  __IO uint32_t RTSR2;       /*!< EXTI Rising trigger selection register 2,   Address offset: 0x28 */
-  __IO uint32_t FTSR2;       /*!< EXTI Falling trigger selection register 2,  Address offset: 0x2C */
-  __IO uint32_t SWIER2;      /*!< EXTI Software interrupt event register 2,   Address offset: 0x30 */
-  __IO uint32_t PR2;         /*!< EXTI Pending register 2,                    Address offset: 0x34 */
-  uint32_t      RESERVED3[2];/*!< Reserved, 0x38-0x3C                                              */
-  __IO uint32_t IMR3;        /*!< EXTI Interrupt mask register 3,             Address offset: 0x40 */
-  __IO uint32_t EMR3;        /*!< EXTI Event mask register 3,                 Address offset: 0x44 */
-  __IO uint32_t RTSR3;       /*!< EXTI Rising trigger selection register 3,   Address offset: 0x48 */
-  __IO uint32_t FTSR3;       /*!< EXTI Falling trigger selection register 3,  Address offset: 0x4C */
-  __IO uint32_t SWIER3;      /*!< EXTI Software interrupt event register 3,   Address offset: 0x50 */
-  __IO uint32_t PR3;         /*!< EXTI Pending register 3,                    Address offset: 0x54 */
-  uint32_t      RESERVED4[2];/*!< Reserved, 0x58-0x5C                                              */
-  __IO uint32_t D3PMR1;      /*!< EXTI D3 Pending mask register 1,            Address offset: 0x60 */
-  __IO uint32_t D3PCR1L;     /*!< EXTI D3 Pending clear selection register 1 low, Address offset: 0x64 */
-  __IO uint32_t D3PCR1H;     /*!< EXTI D3 Pending clear selection register 1 high, Address offset: 0x68 */
-  uint32_t      RESERVED5;   /*!< Reserved, 0x6C                                                   */
-  __IO uint32_t D3PMR2;      /*!< EXTI D3 Pending mask register 2,            Address offset: 0x70 */
-  __IO uint32_t D3PCR2L;     /*!< EXTI D3 Pending clear selection register 2 low, Address offset: 0x74 */
-  __IO uint32_t D3PCR2H;     /*!< EXTI D3 Pending clear selection register 2 high, Address offset: 0x78 */
+  volatile uint32_t IMR1;        /* EXTI Interrupt mask register 1,             Address offset: 0x00 */
+  volatile uint32_t EMR1;        /* EXTI Event mask register 1,                 Address offset: 0x04 */
+  volatile uint32_t RTSR1;       /* EXTI Rising trigger selection register 1,   Address offset: 0x08 */
+  volatile uint32_t FTSR1;       /* EXTI Falling trigger selection register 1,  Address offset: 0x0C */
+  volatile uint32_t SWIER1;      /* EXTI Software interrupt event register 1,   Address offset: 0x10 */
+  volatile uint32_t PR1;         /* EXTI Pending register 1,                    Address offset: 0x14 */
+  uint32_t      RESERVED1;       /* Reserved, 0x18                                                   */
+  uint32_t      RESERVED2;       /* Reserved, 0x1C                                                   */
+  volatile uint32_t IMR2;        /* EXTI Interrupt mask register 2,             Address offset: 0x20 */
+  volatile uint32_t EMR2;        /* EXTI Event mask register 2,                 Address offset: 0x24 */
+  volatile uint32_t RTSR2;       /* EXTI Rising trigger selection register 2,   Address offset: 0x28 */
+  volatile uint32_t FTSR2;       /* EXTI Falling trigger selection register 2,  Address offset: 0x2C */
+  volatile uint32_t SWIER2;      /* EXTI Software interrupt event register 2,   Address offset: 0x30 */
+  volatile uint32_t PR2;         /* EXTI Pending register 2,                    Address offset: 0x34 */
+  uint32_t      RESERVED3[2];    /* Reserved, 0x38-0x3C                                              */
+  volatile uint32_t IMR3;        /* EXTI Interrupt mask register 3,             Address offset: 0x40 */
+  volatile uint32_t EMR3;        /* EXTI Event mask register 3,                 Address offset: 0x44 */
+  volatile uint32_t RTSR3;       /* EXTI Rising trigger selection register 3,   Address offset: 0x48 */
+  volatile uint32_t FTSR3;       /* EXTI Falling trigger selection register 3,  Address offset: 0x4C */
+  volatile uint32_t SWIER3;      /* EXTI Software interrupt event register 3,   Address offset: 0x50 */
+  volatile uint32_t PR3;         /* EXTI Pending register 3,                    Address offset: 0x54 */
+  uint32_t      RESERVED4[2];    /* Reserved, 0x58-0x5C                                              */
+  volatile uint32_t D3PMR1;      /* EXTI D3 Pending mask register 1,            Address offset: 0x60 */
+  volatile uint32_t D3PCR1L;     /* EXTI D3 Pending clear selection register 1 low, Address offset: 0x64 */
+  volatile uint32_t D3PCR1H;     /* EXTI D3 Pending clear selection register 1 high, Address offset: 0x68 */
+  uint32_t      RESERVED5;       /* Reserved, 0x6C                                                   */
+  volatile uint32_t D3PMR2;      /* EXTI D3 Pending mask register 2,            Address offset: 0x70 */
+  volatile uint32_t D3PCR2L;     /* EXTI D3 Pending clear selection register 2 low, Address offset: 0x74 */
+  volatile uint32_t D3PCR2H;     /* EXTI D3 Pending clear selection register 2 high, Address offset: 0x78 */
 } EXTI_TypeDef;
 
 /* Exported constants --------------------------------------------------------*/
