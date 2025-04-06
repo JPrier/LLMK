@@ -13,17 +13,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install ARM GCC Toolchain
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi cmake
-    
-    - name: Build Firmware
-      run: |
-        mkdir -p build
-        cd build
-        cmake .. -DCI_BUILD=ON
-        make
+    - name: Build STM32 Project
+      uses: xanderhendriks/action-build-stm32cubeide@v9.0
+      with:
+        project-path: .
+        project-target: LLMK
     
     - name: Upload Firmware Artifacts
       uses: actions/upload-artifact@v4
@@ -32,6 +26,10 @@ jobs:
         path: |
           build/*.hex
           build/*.bin
+          Debug/*.hex
+          Debug/*.bin
+          Release/*.hex
+          Release/*.bin
   
   static-analysis:
     runs-on: ubuntu-latest
