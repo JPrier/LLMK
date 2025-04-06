@@ -173,10 +173,32 @@ typedef struct
                                   ((LINE) == EXTI_LINE12) || ((LINE) == EXTI_LINE13) || \
                                   ((LINE) == EXTI_LINE14) || ((LINE) == EXTI_LINE15))
 
+#define IS_EXTI_D1_LINE          IS_EXTI_D3_LINE
+#define IS_EXTI_D2_LINE          IS_EXTI_D3_LINE
+#define IS_EXTI_EDGE_LINE        IS_EXTI_D3_LINE
+#define IS_HAL_EXTI_CONFIG_LINE  IS_EXTI_D3_LINE
+
 #define IS_EXTI_D3_CLEAR(CLEAR)  (((CLEAR) == EXTI_D3_CLEAR_NONE) || \
                                   ((CLEAR) == EXTI_D3_CLEAR_EXTI) || \
                                   ((CLEAR) == EXTI_D3_CLEAR_RTC)  || \
                                   ((CLEAR) == EXTI_D3_CLEAR_LPTIM1))
+
+/* Register access macros */
+#define READ_REG(REG)         ((REG))
+#define WRITE_REG(REG, VAL)   ((REG) = (VAL))
+#define READ_BIT(REG, BIT)    ((REG) & (BIT))
+#define WRITE_BIT(REG, BIT, VAL) ((REG) = (((REG) & (~(BIT))) | ((VAL) & (BIT))))
+#define CLEAR_BIT(REG, BIT)   ((REG) &= ~(BIT))
+#define SET_BIT(REG, BIT)     ((REG) |= (BIT))
+
+/* FMC definitions for CI build */
+typedef struct {
+  volatile uint32_t BTCR[8];
+} FMC_Bank1_TypeDef;
+
+extern FMC_Bank1_TypeDef* FMC_Bank1_R;
+
+#define FMC_BCR1_BMAP         0x00000002U
 
 /* External variables */
 extern volatile uint32_t uwTick;
@@ -225,8 +247,8 @@ void HAL_EXTI_EdgeConfig(uint32_t EXTI_Line, uint32_t EXTI_Edge);
 void HAL_EXTI_GenerateSWInterrupt(uint32_t EXTI_Line);
 void HAL_EXTI_D1_ClearFlag(uint32_t EXTI_Line);
 void HAL_EXTI_D2_ClearFlag(uint32_t EXTI_Line);
-void HAL_EXTI_D1_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_LineCmd);
-void HAL_EXTI_D2_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_LineCmd);
+void HAL_EXTI_D1_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_Mode, uint32_t EXTI_LineCmd);
+void HAL_EXTI_D2_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_Mode, uint32_t EXTI_LineCmd);
 void HAL_EXTI_D3_EventInputConfig(uint32_t EXTI_Line, uint32_t EXTI_LineCmd, uint32_t EXTI_ClearSrc);
 
 #ifdef __cplusplus
