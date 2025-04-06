@@ -1,0 +1,14 @@
+# Build outputs
+build/
+*.o
+*.elf
+*.hex
+*.bin
+*.map
+
+# IDE files
+.vscode/
+.idea/
+
+# Unity test outputs
+tests/*.bin
