@@ -3,9 +3,9 @@
  * @brief Main entry point for the LLMK firmware
  */
 
-#include "main.h"
-#include "keyboard.h"
-#include "usb_device.h"
+#include "../Inc/main.h"
+#include "../Inc/keyboard.h"
+#include "../Inc/usb_device.h"
 
 /**
  * @brief  The application entry point.

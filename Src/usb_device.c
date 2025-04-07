@@ -3,8 +3,8 @@
  * @brief USB Device implementation for HID keyboard
  */
 
-#include "usb_device.h"
-#include "usbd_hid.h"
+#include "../Inc/usb_device.h"
+#include "../USB/Device/usbd_hid.h"
 
 /* Private variables ---------------------------------------------------------*/
 static USBD_HandleTypeDef hUsbDeviceFS;
