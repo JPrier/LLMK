@@ -34,10 +34,12 @@ add_link_options(
 
 # Include directories
 include_directories(
-    inc
-    drivers/CMSIS/Include
-    drivers/${MCU_FAMILY}_HAL_Driver/Inc
-    usb/device
+    ${CMAKE_SOURCE_DIR}/inc
+    ${CMAKE_SOURCE_DIR}/drivers/CMSIS/Include
+    ${CMAKE_SOURCE_DIR}/drivers/${MCU_FAMILY}_HAL_Driver/Inc
+    ${CMAKE_SOURCE_DIR}/usb/device
+    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/CMSIS/Include
+    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/${MCU_FAMILY}_HAL_Driver/Inc
 )
 
 # Define the target processor
