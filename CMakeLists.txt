@@ -39,10 +39,10 @@ add_link_options(
 
 # Include directories
 include_directories(
-    inc
-    drivers/CMSIS/Include
-    drivers/${MCU_FAMILY}_HAL_Driver/Inc
-    usb/device
+    Inc
+    Drivers/CMSIS/Include
+    Drivers/${MCU_FAMILY}_HAL_Driver/Inc
+    USB/Device
 )
 
 # Define the target processor
@@ -54,7 +54,10 @@ add_definitions(
 
 # Source files
 file(GLOB_RECURSE SOURCES
-    "src/*.c"
+    "Src/*.c"
+    "Drivers/${MCU_FAMILY}_HAL_Driver/Src/*.c"
+    "Startup/*.c"
+    "Startup/*.s"
 )
 
 # Executable
@@ -75,7 +78,7 @@ add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
 
 # Add targets for running linters
 add_custom_target(cppcheck
-    COMMAND cppcheck --enable=all --std=c99 --platform=arm32-wchar_t4 --suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/tools/cppcheck-suppressions.txt -I${CMAKE_CURRENT_SOURCE_DIR}/inc --output-file=${CMAKE_CURRENT_BINARY_DIR}/cppcheck-result.xml ${CMAKE_CURRENT_SOURCE_DIR}/src
+    COMMAND cppcheck --enable=all --std=c99 --platform=arm32-wchar_t4 --suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/Tools/cppcheck-suppressions.txt -I${CMAKE_CURRENT_SOURCE_DIR}/Inc -I${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Include -I${CMAKE_CURRENT_SOURCE_DIR}/Drivers/${MCU_FAMILY}_HAL_Driver/Inc --output-file=${CMAKE_CURRENT_BINARY_DIR}/cppcheck-result.xml ${CMAKE_CURRENT_SOURCE_DIR}/Src
     COMMENT "Running Cppcheck static code analysis"
 )
 
