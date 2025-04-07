@@ -31,6 +31,7 @@ add_link_options(
     ${CPU_PARAMETERS}
     -Wl,--gc-sections
     -nostartfiles
+    -T${CMAKE_CURRENT_SOURCE_DIR}/Startup/STM32H723ZGTX_FLASH.ld
     --specs=nano.specs
     --specs=nosys.specs
 )
