@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 
+# Set the toolchain file if not in Docker environment
+if(NOT DEFINED ENV{DOCKER_BUILD})
+  set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/arm-none-eabi-gcc.cmake)
+endif()
+
 # Project name
 project(LLMK C ASM)
 
