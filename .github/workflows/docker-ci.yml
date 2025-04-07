@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: stm32duino/arm-none-eabi-gcc:latest
+      image: ghcr.io/armmbed/mbed-os-env:latest
     
     steps:
     - uses: actions/checkout@v3
