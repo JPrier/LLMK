@@ -3,8 +3,8 @@
  * @brief Keyboard handling implementation
  */
 
-#include "keyboard.h"
-#include "usb_device.h"
+#include "../Inc/keyboard.h"
+#include "../Inc/usb_device.h"
 #include <string.h>
 
 /* Private defines -----------------------------------------------------------*/

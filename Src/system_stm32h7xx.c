@@ -5,7 +5,7 @@
   ******************************************************************************
   */
 
-#include "stm32h7xx.h"
+#include "../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h"
 
 /**
   * @brief  Setup the microcontroller system
