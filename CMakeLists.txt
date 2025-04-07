@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
+# Set the toolchain file
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/arm-none-eabi-gcc.cmake)
+
 # Project name
 project(LLMK C ASM)
 
