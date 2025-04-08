@@ -8,6 +8,7 @@ build/
 
 # IDE files
 .vscode/
+.vs/
 .idea/
 
 # Unity test outputs
