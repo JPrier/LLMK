@@ -16,7 +16,7 @@ jobs:
         submodules: true
     
     - name: Build STM32 Project
-      uses: xanderhendriks/action-build-stm32cubeide@v9.0
+      uses: xanderhendriks/action-build-stm32cubeide@v10.0
       with:
         project-path: .
         project-target: LLMK
