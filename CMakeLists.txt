@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.20)
 
+# Set the toolchain file
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/cmake/toolchain.cmake)
+
 # Project name
 project(LLMK C ASM)
+
+# Set the path for custom modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 # Processor and board configurations
 set(MCU_FAMILY STM32H7xx)
@@ -32,16 +38,6 @@ add_link_options(
     --specs=nosys.specs
 )
 
-# Include directories
-include_directories(
-    ${CMAKE_SOURCE_DIR}/inc
-    ${CMAKE_SOURCE_DIR}/drivers/CMSIS/Include
-    ${CMAKE_SOURCE_DIR}/drivers/${MCU_FAMILY}_HAL_Driver/Inc
-    ${CMAKE_SOURCE_DIR}/USB/Device
-    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/CMSIS/Include
-    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/${MCU_FAMILY}_HAL_Driver/Inc
-)
-
 # Define the target processor
 add_definitions(
     -D${MCU_MODEL}
@@ -49,13 +45,32 @@ add_definitions(
     -DCI_BUILD
 )
 
-# Source files
-file(GLOB_RECURSE SOURCES
-    "src/*.c"
+# Specify the target executable
+add_executable(${PROJECT_NAME}.elf)
+
+# Include subdirectories
+add_subdirectory(src)
+add_subdirectory(drivers)
+add_subdirectory(usb)
+add_subdirectory(startup)
+
+# Include directories
+target_include_directories(${PROJECT_NAME}.elf PRIVATE
+    ${CMAKE_SOURCE_DIR}/inc
+    ${CMAKE_SOURCE_DIR}/drivers/CMSIS/Include
+    ${CMAKE_SOURCE_DIR}/drivers/${MCU_FAMILY}_HAL_Driver/Inc
+    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/CMSIS/Include
+    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/CMSIS/Device/ST/${MCU_FAMILY}/Include
+    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/${MCU_FAMILY}_HAL_Driver/Inc
 )
 
-# Executable
-add_executable(${PROJECT_NAME}.elf ${SOURCES})
+# Link libraries
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE
+    src
+    drivers
+    usb
+    startup
+)
 
 # Generate hex and binary files
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
