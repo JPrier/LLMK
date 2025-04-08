@@ -5,7 +5,7 @@
   ******************************************************************************
   */
 
-#include "stm32h7xx.h"
+#include "../inc/stm32h7xx.h"
 
 /**
   * @brief  Setup the microcontroller system
