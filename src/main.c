@@ -4,6 +4,7 @@
  */
 
 #include "main.h"
+#include "stm32h7xx_hal.h"  // ensure HAL is included
 #include "keyboard.h"
 #include "usb_device.h"
 
