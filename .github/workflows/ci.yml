@@ -11,9 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
-        submodules: true
+        submodules: recursive
+    
+    - name: Set up ARM GCC toolchain
+      uses: carlosperate/arm-none-eabi-gcc-action@v1
+      with:
+        release: 'latest'  # Or specify a version like '10.3-2021.10'
     
     - name: Build STM32 Project
       uses: xanderhendriks/action-build-stm32cubeide@v9.0
