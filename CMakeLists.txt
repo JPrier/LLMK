@@ -34,10 +34,10 @@ add_link_options(
 
 # Include directories
 include_directories(
-    ${CMAKE_SOURCE_DIR}/inc
+    ${CMAKE_SOURCE_DIR}/Inc
     ${CMAKE_SOURCE_DIR}/drivers/CMSIS/Include
     ${CMAKE_SOURCE_DIR}/drivers/${MCU_FAMILY}_HAL_Driver/Inc
-    ${CMAKE_SOURCE_DIR}/usb/device
+    ${CMAKE_SOURCE_DIR}/USB/Device
     ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/CMSIS/Include
     ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/${MCU_FAMILY}_HAL_Driver/Inc
 )
