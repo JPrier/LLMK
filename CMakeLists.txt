@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
-
-# Project name
 project(LLMK C ASM)
 
-# Processor and board configurations
+#---------------------------------------------------------------------
+# Board and CPU Configuration
+#---------------------------------------------------------------------
 set(MCU_FAMILY STM32H7xx)
 set(MCU_MODEL STM32H723xx)
 set(CPU_PARAMETERS
@@ -13,7 +13,9 @@ set(CPU_PARAMETERS
     -mfloat-abi=hard
 )
 
-# Compiler and linker flags
+#---------------------------------------------------------------------
+# Compiler Options
+#---------------------------------------------------------------------
 add_compile_options(
     ${CPU_PARAMETERS}
     -Wall
@@ -24,6 +26,9 @@ add_compile_options(
     -Os
 )
 
+#---------------------------------------------------------------------
+# Linker Options
+#---------------------------------------------------------------------
 add_link_options(
     ${CPU_PARAMETERS}
     -Wl,--gc-sections
@@ -32,7 +37,9 @@ add_link_options(
     --specs=nosys.specs
 )
 
-# Include directories
+#---------------------------------------------------------------------
+# Include Directories
+#---------------------------------------------------------------------
 include_directories(
     ${CMAKE_SOURCE_DIR}/inc
     ${CMAKE_SOURCE_DIR}/drivers/CMSIS/Include
@@ -42,42 +49,57 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/${MCU_FAMILY}_HAL_Driver/Inc
 )
 
-# Define the target processor
+#---------------------------------------------------------------------
+# Preprocessor Definitions
+#---------------------------------------------------------------------
 add_definitions(
     -D${MCU_MODEL}
     -DUSE_HAL_DRIVER
     -DCI_BUILD
 )
 
-# Source files
-file(GLOB_RECURSE SOURCES
-    "src/*.c"
-)
+#---------------------------------------------------------------------
+# Source Files
+#---------------------------------------------------------------------
+file(GLOB_RECURSE SOURCES "src/*.c")
 
-# Executable
+#---------------------------------------------------------------------
+# Executable Target
+#---------------------------------------------------------------------
 add_executable(${PROJECT_NAME}.elf ${SOURCES})
 
-# Generate hex and binary files
+#---------------------------------------------------------------------
+# Post-Build Commands
+#  - Generate HEX and Binary Files
+#  - Calculate Binary Size
+#---------------------------------------------------------------------
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -O ihex ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex
     COMMAND ${CMAKE_OBJCOPY} -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.bin
-    COMMENT "Generating hex and binary files"
+    COMMENT "Generating HEX and BIN files..."
 )
 
-# Calculate binary size
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
     COMMAND ${CMAKE_SIZE} --format=berkeley ${PROJECT_NAME}.elf
-    COMMENT "Calculating binary size"
+    COMMENT "Calculating binary size..."
 )
 
-# Add targets for running linters
+#---------------------------------------------------------------------
+# Custom Targets
+#---------------------------------------------------------------------
+# Static analysis using Cppcheck
 add_custom_target(cppcheck
-    COMMAND cppcheck --enable=all --std=c99 --platform=arm32-wchar_t4 --suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/tools/cppcheck-suppressions.txt -I${CMAKE_CURRENT_SOURCE_DIR}/inc --output-file=${CMAKE_CURRENT_BINARY_DIR}/cppcheck-result.xml ${CMAKE_CURRENT_SOURCE_DIR}/src
-    COMMENT "Running Cppcheck static code analysis"
+    COMMAND cppcheck --enable=all --std=c99 --platform=arm32-wchar_t4
+            --suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/tools/cppcheck-suppressions.txt
+            -I${CMAKE_CURRENT_SOURCE_DIR}/inc
+            --output-file=${CMAKE_CURRENT_BINARY_DIR}/cppcheck-result.xml
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+    COMMENT "Running Cppcheck static analysis..."
 )
 
-# Add targets for running unit tests
+# Unit tests using Unity (assumes a Makefile exists in tests folder)
 add_custom_target(tests
-    COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/tests && make test
-    COMMENT "Running Unity unit tests"
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_SOURCE_DIR}/tests make test
+    COMMENT "Running Unity unit tests..."
 )
+
