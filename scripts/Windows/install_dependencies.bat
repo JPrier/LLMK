@@ -22,15 +22,10 @@ choco install -y gcc-arm-embedded
 :: Install CMake
 choco install -y cmake
 
-:: Install optional tools for flashing (if user wants them)
-echo Do you want to install STM32CubeProgrammer? (Y/N)
-set /p install_programmer=
-if /i "%install_programmer%"=="Y" (
-    echo Please download and install STM32CubeProgrammer from:
-    echo https://www.st.com/en/development-tools/stm32cubeprog.html
-    echo This requires a free ST account.
-)
+:: Install Ninja
+choco install -y ninja
 
 echo Dependencies installed successfully.
 pause
+
 

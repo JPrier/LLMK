@@ -5,6 +5,7 @@ build/
 *.hex
 *.bin
 *.map
+CMakeFiles/
 
 # IDE files
 .vscode/
