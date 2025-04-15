@@ -22,17 +22,4 @@ int main(void)
   
   /* Initialize all configured peripherals */
   /* This would configure GPIO pins for key inputs with external interrupts */
-  
-  /* Initialize USB device */
-  MX_USB_DEVICE_Init();
-  
-  /* Initialize keyboard handling */
-  Keyboard_Init();
-
-  /* Infinite loop */
-  while (1)
-  {
-    /* Process keyboard events */
-    Keyboard_Process();
-  }
 }

@@ -255,11 +255,11 @@ static void USB_Send_Keypress(uint8_t key)
   keyReport[2] = key;
   
   /* Send the report via USB */
-  USBD_HID_SendReport(keyReport, sizeof(keyReport));
+  USB_Send_Report(keyReport, sizeof(keyReport));
   
   /* Send empty report to indicate key release */
   memset(keyReport, 0, sizeof(keyReport));
-  USBD_HID_SendReport(keyReport, sizeof(keyReport));
+  USB_Send_Report(keyReport, sizeof(keyReport));
 }
 
 /**

@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 project(LLMK C ASM)
 
+# Set the size utility (adjust the path if necessary)
+set(CMAKE_SIZE "arm-none-eabi-size")
+
+# Specify the entry point for the linker (assuming your startup file defines Reset_Handler)
+add_link_options(-e Reset_Handler)
+
 #---------------------------------------------------------------------
 # Board and CPU Configuration
 #---------------------------------------------------------------------
@@ -41,12 +47,13 @@ add_link_options(
 # Include Directories
 #---------------------------------------------------------------------
 include_directories(
-    ${CMAKE_SOURCE_DIR}/inc
-    ${CMAKE_SOURCE_DIR}/drivers/CMSIS/Include
-    ${CMAKE_SOURCE_DIR}/drivers/${MCU_FAMILY}_HAL_Driver/Inc
-    ${CMAKE_SOURCE_DIR}/USB/Device
+    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
+    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Middlewares/ST/STM32_USB_Device_Library/Class/HID/Inc
     ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/CMSIS/Include
+    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/CMSIS/Device/ST/${MCU_FAMILY}/Include
     ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/${MCU_FAMILY}_HAL_Driver/Inc
+    ${CMAKE_SOURCE_DIR}/USB/Device
+    ${CMAKE_SOURCE_DIR}/inc
 )
 
 #---------------------------------------------------------------------
@@ -70,8 +77,8 @@ add_executable(${PROJECT_NAME}.elf ${SOURCES})
 
 #---------------------------------------------------------------------
 # Post-Build Commands
-#  - Generate HEX and Binary Files
-#  - Calculate Binary Size
+#  - Generate HEX and BIN files
+#  - Calculate binary size
 #---------------------------------------------------------------------
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -O ihex ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex
@@ -89,7 +96,7 @@ add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
 #---------------------------------------------------------------------
 # Static analysis using Cppcheck
 add_custom_target(cppcheck
-    COMMAND cppcheck --enable=all --std=c99 --platform=arm32-wchar_t4
+    COMMAND cppcheck --enable=all --std=c99 --platform=arm32-wchar-t4
             --suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/tools/cppcheck-suppressions.txt
             -I${CMAKE_CURRENT_SOURCE_DIR}/inc
             --output-file=${CMAKE_CURRENT_BINARY_DIR}/cppcheck-result.xml
@@ -102,4 +109,3 @@ add_custom_target(tests
     COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_SOURCE_DIR}/tests make test
     COMMENT "Running Unity unit tests..."
 )
-
