@@ -21,11 +21,11 @@ jobs:
       with:
         release: 'latest'  # Or specify a version like '10.3-2021.10'
     
-    - name: Build STM32 Project
-      uses: xanderhendriks/action-build-stm32cubeide@v9.0
-      with:
-        project-path: .
-        project-target: LLMK
+    - name: Configure with CMake
+      run: cmake -S . -B build
+
+    - name: Build with CMake
+      run: cmake --build build -- -j4
     
     - name: Upload Firmware Artifacts
       uses: actions/upload-artifact@v4

@@ -96,7 +96,7 @@ add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
 #---------------------------------------------------------------------
 # Static analysis using Cppcheck
 add_custom_target(cppcheck
-    COMMAND cppcheck --enable=all --std=c99 --platform=arm32-wchar-t4
+    COMMAND cppcheck --enable=all --std=c99
             --suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/tools/cppcheck-suppressions.txt
             -I${CMAKE_CURRENT_SOURCE_DIR}/inc
             --output-file=${CMAKE_CURRENT_BINARY_DIR}/cppcheck-result.xml
