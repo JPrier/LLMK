@@ -16,15 +16,13 @@ jobs:
       with:
         submodules: recursive
     
-    - name: Set up ARM GCC toolchain
-      uses: carlosperate/arm-none-eabi-gcc-action@v1
-      with:
-        release: 'latest'  # Or specify a version like '10.3-2021.10'
-    
-    - name: Configure with CMake
-      run: cmake -S . -B build
+    - name: Install Ninja Build
+      run: sudo apt-get update && sudo apt-get install -y ninja-build
 
-    - name: Build with CMake
+    - name: Configure CMake
+      run: cmake -G "Ninja" -B build -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/arm-gcc-toolchain.cmake" "${{ github.workspace }}"
+
+    - name: Build Project
       run: cmake --build build -- -j4
     
     - name: Upload Firmware Artifacts
