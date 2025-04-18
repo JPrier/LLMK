@@ -47,12 +47,6 @@ add_link_options(
 # Include Directories
 #---------------------------------------------------------------------
 include_directories(
-    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
-    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Middlewares/ST/STM32_USB_Device_Library/Class/HID/Inc
-    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/CMSIS/Include
-    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/CMSIS/Device/ST/${MCU_FAMILY}/Include
-    ${CMAKE_SOURCE_DIR}/drivers/STM32CubeH7/Drivers/${MCU_FAMILY}_HAL_Driver/Inc
-    ${CMAKE_SOURCE_DIR}/USB/Device
     ${CMAKE_SOURCE_DIR}/inc
 )
 
