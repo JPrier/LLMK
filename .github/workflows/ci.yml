@@ -16,7 +16,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Debug: Show directory structure
+      - name: Show directory structure
         run: |
           echo "Current path: $(pwd)"
           find ${{ github.workspace }} -type f
