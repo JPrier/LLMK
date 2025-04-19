@@ -6,6 +6,7 @@ build/
 *.bin
 *.map
 CMakeFiles/
+*.DS_Store
 
 # IDE files
 .vscode/

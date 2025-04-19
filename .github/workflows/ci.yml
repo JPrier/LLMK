@@ -16,6 +16,29 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Show directory structure
+        run: |
+          echo "Current path: $(pwd)"
+          find ${{ github.workspace }} -type f
+
+      - name: Confirm file type and permissions
+        run: |
+          set -eux
+          ls -l "${{ github.workspace }}/src/service/main.c"
+          file "${{ github.workspace }}/src/service/main.c"
+          stat "${{ github.workspace }}/src/service/main.c"
+
+      - name: Check expected source files
+        run: |
+          set -eux
+          echo "Checking main.c..."
+          test -f "${{ github.workspace }}/src/service/main.c" && echo "✓ main.c found"
+          echo "Checking stm32h723xx.h..."
+          test -f "${{ github.workspace }}/inc/system/stm32h723xx.h" && echo "✓ stm32h723xx.h found"
+          echo "Checking toolchain..."
+          test -f "${{ github.workspace }}/arm-gcc-toolchain.cmake" && echo "✓ toolchain found"
+        
+
       - name: Install Ninja Build
         run: sudo apt-get update && sudo apt-get install -y ninja-build
 
@@ -25,10 +48,14 @@ jobs:
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi
 
       - name: Configure CMake
-        run: cmake -G "Ninja" -B build -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/arm-gcc-toolchain.cmake" "${{ github.workspace }}"
+        run: |
+          set -eux
+          cmake -G "Ninja" -B build -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/arm-gcc-toolchain.cmake" "${{ github.workspace }}"
 
       - name: Build Project
-        run: cmake --build build -- -j4
+        run: |
+          set -eux
+          cmake --build build -- -j4 -v
 
       - name: Upload Firmware Artifacts
         uses: actions/upload-artifact@v4
@@ -38,6 +65,7 @@ jobs:
             build/*.hex
             build/*.bin
             build/*.elf
+
 
   static-analysis:
     runs-on: ubuntu-latest

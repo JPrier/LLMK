@@ -2,6 +2,17 @@ cmake_minimum_required(VERSION 3.20)
 project(LLMK C ASM)
 
 # ---------------------------------------------------------------------
+# Configurations
+# ---------------------------------------------------------------------
+include(cmake/build_config.cmake)
+
+# Inject into compiler
+add_definitions(
+  -DNUM_ROWS=${NUM_ROWS}
+  -DNUM_COLS=${NUM_COLS}
+)
+
+# ---------------------------------------------------------------------
 # Platform Detection
 # ---------------------------------------------------------------------
 if (CMAKE_TOOLCHAIN_FILE)
@@ -13,12 +24,19 @@ else()
     message(STATUS "No toolchain file detected — configuring for native build")
 endif()
 
+if(HOST_BUILD)
+  add_definitions(-DHOST_BUILD)
+  add_library(gpio_accessor tst/dependency/gpio_accessor_mock.c)
+else()
+  add_library(gpio_accessor src/dependency/gpio_accessor_stm32.c)
+endif()
+
 # ---------------------------------------------------------------------
 # Embedded Build Configuration (STM32)
 # ---------------------------------------------------------------------
 if(TARGET_PLATFORM STREQUAL "embedded")
     set(MCU_FAMILY STM32H7xx)
-    set(MCU_MODEL STM32H723xx)
+    set(MCU_MODEL STM32H723x)
 
     set(CPU_PARAMETERS
         -mcpu=cortex-m7
@@ -67,8 +85,14 @@ endif()
 # Include Directories
 # ---------------------------------------------------------------------
 include_directories(
-    ${CMAKE_SOURCE_DIR}/inc
+  ${CMAKE_SOURCE_DIR}/inc
+  ${CMAKE_SOURCE_DIR}/inc/dependency
+  ${CMAKE_SOURCE_DIR}/inc/system
+  ${CMAKE_SOURCE_DIR}/inc/logic
+  ${CMAKE_SOURCE_DIR}/inc/data
+  ${CMAKE_SOURCE_DIR}/inc/service
 )
+
 
 # ---------------------------------------------------------------------
 # Global Preprocessor Defines
@@ -85,7 +109,22 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 # ---------------------------------------------------------------------
 # Executable Target
 # ---------------------------------------------------------------------
-add_executable(${PROJECT_NAME}.elf ${SOURCES})
+if(HOST_BUILD)
+  add_executable(host_tests
+    tst/service/test_main.c
+    tst/dependency/gpio_accessor_mock.c
+    src/logic/matrix_scanner.c
+    # Do NOT include system_init.c or anything that includes STM32 headers
+  )
+else()
+  add_executable(LLMK.elf
+    src/system/system_init.c
+    src/service/main.c
+    src/dependency/gpio_accessor_stm32.c
+    # everything else
+  )
+endif()
+
 
 # ---------------------------------------------------------------------
 # Native-only Development Tools (Tests, SCA, Benchmarks)
