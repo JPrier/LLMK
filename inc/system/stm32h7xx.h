@@ -18,7 +18,7 @@ extern "C" {
 
 // Include device-specific header
 #if defined(STM32H723x)
-#include "stm32h723xx.h"
+#include "stm32h723x.h"
 #else
 #error "Please define your STM32H7 target device (e.g. STM32H723x)"
 #endif
