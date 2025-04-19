@@ -1,5 +1,5 @@
-#include "gpio_accessor.h"
-#include "stm32h7xx.h"
+#include "dependency/gpio_accessor.h"
+#include "system/stm32h7xx.h"
 
 static void set_row_high_impl(int row) {
     // Use BSRR register

@@ -3,7 +3,7 @@
  * @brief Main entry point for the LLMK firmware
  */
 
- #include "system_init.h"
+ #include "system/system_init.h"
  
  int main(void) {
      init_clocks();

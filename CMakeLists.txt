@@ -73,14 +73,8 @@ endif()
 # ---------------------------------------------------------------------
 # Include Directories
 # ---------------------------------------------------------------------
-include_directories(
-    ${CMAKE_SOURCE_DIR}/inc
-    ${CMAKE_SOURCE_DIR}/inc/system
-    ${CMAKE_SOURCE_DIR}/inc/dependency
-    ${CMAKE_SOURCE_DIR}/inc/data
-    ${CMAKE_SOURCE_DIR}/inc/logic
-    ${CMAKE_SOURCE_DIR}/inc/service
-)
+file(GLOB_RECURSE PROJECT_INCLUDES "${CMAKE_SOURCE_DIR}/inc/*")
+include_directories(${PROJECT_INCLUDES})
 
 # ---------------------------------------------------------------------
 # Global Preprocessor Defines

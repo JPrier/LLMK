@@ -1,4 +1,4 @@
-#include "gpio_accessor.h"
+#include "dependency/gpio_accessor.h"
 
 void scan_matrix(int* result_buffer, int max) {
     int count = 0;

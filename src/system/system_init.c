@@ -1,4 +1,4 @@
-#include "stm32h7xx.h"
+#include "system/stm32h7xx.h"
 
 void init_clocks(void) {
     // 1. Enable power interface and allow voltage scaling config
