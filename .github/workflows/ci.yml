@@ -30,9 +30,14 @@ jobs:
 
       - name: Check expected source files
         run: |
-          test -f "${{ github.workspace }}/src/service/main.c"
-          test -f "${{ github.workspace }}/inc/system/stm32h723xx.h"
-          test -f "${{ github.workspace }}/arm-gcc-toolchain.cmake"
+          set -eux
+          echo "Checking main.c..."
+          test -f "${{ github.workspace }}/src/service/main.c" && echo "✓ main.c found"
+          echo "Checking stm32h723xx.h..."
+          test -f "${{ github.workspace }}/inc/system/stm32h723xx.h" && echo "✓ stm32h723xx.h found"
+          echo "Checking toolchain..."
+          test -f "${{ github.workspace }}/arm-gcc-toolchain.cmake" && echo "✓ toolchain found"
+        
 
       - name: Install Ninja Build
         run: sudo apt-get update && sudo apt-get install -y ninja-build
