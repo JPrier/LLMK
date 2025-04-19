@@ -36,7 +36,7 @@ endif()
 # ---------------------------------------------------------------------
 if(TARGET_PLATFORM STREQUAL "embedded")
     set(MCU_FAMILY STM32H7xx)
-    set(MCU_MODEL STM32H723xx)
+    set(MCU_MODEL STM32H723x)
 
     set(CPU_PARAMETERS
         -mcpu=cortex-m7
