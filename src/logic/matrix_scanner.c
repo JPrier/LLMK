@@ -1,6 +1,6 @@
 #include "dependency/gpio_accessor.h"
 
-void scan_matrix(int* result_buffer, int max) {
+void scan_matrix(int* result_buffer) {
     int count = 0;
     for (int row = 0; row < NUM_ROWS; row++) {
         gpio->set_row_high(row);

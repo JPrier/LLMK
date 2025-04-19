@@ -1,4 +1,3 @@
-// inc/gpio_accessor.h
 #ifndef GPIO_ACCESSOR_H
 #define GPIO_ACCESSOR_H
 

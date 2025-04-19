@@ -2,6 +2,17 @@ cmake_minimum_required(VERSION 3.20)
 project(LLMK C ASM)
 
 # ---------------------------------------------------------------------
+# Configurations
+# ---------------------------------------------------------------------
+include(cmake/build_config.cmake)
+
+# Inject into compiler
+add_definitions(
+  -DNUM_ROWS=${NUM_ROWS}
+  -DNUM_COLS=${NUM_COLS}
+)
+
+# ---------------------------------------------------------------------
 # Platform Detection
 # ---------------------------------------------------------------------
 if (CMAKE_TOOLCHAIN_FILE)
@@ -73,8 +84,15 @@ endif()
 # ---------------------------------------------------------------------
 # Include Directories
 # ---------------------------------------------------------------------
-file(GLOB_RECURSE PROJECT_INCLUDES "${CMAKE_SOURCE_DIR}/inc/*")
-include_directories(${PROJECT_INCLUDES})
+include_directories(
+  ${CMAKE_SOURCE_DIR}/inc
+  ${CMAKE_SOURCE_DIR}/inc/dependency
+  ${CMAKE_SOURCE_DIR}/inc/system
+  ${CMAKE_SOURCE_DIR}/inc/logic
+  ${CMAKE_SOURCE_DIR}/inc/data
+  ${CMAKE_SOURCE_DIR}/inc/service
+)
+
 
 # ---------------------------------------------------------------------
 # Global Preprocessor Defines
@@ -91,17 +109,22 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 # ---------------------------------------------------------------------
 # Executable Target
 # ---------------------------------------------------------------------
-# Host build (macOS)
-add_executable(host_tests
-  tst/service/test_main.c
-)
+if(HOST_BUILD)
+  add_executable(host_tests
+    tst/service/test_main.c
+    tst/dependency/gpio_accessor_mock.c
+    src/logic/matrix_scanner.c
+    # Do NOT include system_init.c or anything that includes STM32 headers
+  )
+else()
+  add_executable(LLMK.elf
+    src/system/system_init.c
+    src/service/main.c
+    src/dependency/gpio_accessor_stm32.c
+    # everything else
+  )
+endif()
 
-# STM32 build
-add_executable(LLMK.elf
-  src/service/main.c
-  src/system/system_init.c
-  src/logic/matrix_scanner.c
-)
 
 # ---------------------------------------------------------------------
 # Native-only Development Tools (Tests, SCA, Benchmarks)

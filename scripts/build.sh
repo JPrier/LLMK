@@ -16,18 +16,25 @@ echo "Creating build folder..."
 mkdir -p "$PROJECT_ROOT/build"
 cd "$PROJECT_ROOT/build"
 
+# Set the build output path based on target
+if [[ "$1" == "--stm32" ]]; then
+    BUILD_DIR="$PROJECT_ROOT/build/stm32"
+else
+    BUILD_DIR="$PROJECT_ROOT/build/host"
+fi
+
 # Use toolchain if provided via argument
 if [[ "$1" == "--stm32" ]]; then
     echo "Configuring project for embedded target..."
-    cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE="$PROJECT_ROOT/arm-gcc-toolchain.cmake" -B build/stm32 "$PROJECT_ROOT"
+    cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE="$PROJECT_ROOT/arm-gcc-toolchain.cmake" -B "$BUILD_DIR" "$PROJECT_ROOT"
 else
     echo "Configuring project for native build..."
-    cmake -G Ninja -DHOST_BUILD=ON -B build/host "$PROJECT_ROOT"
+    cmake -G Ninja -DHOST_BUILD=ON -B "$BUILD_DIR" "$PROJECT_ROOT"
 fi
 
 # Build the project
 echo "Building project..."
-cmake --build .
+cmake --build "$BUILD_DIR" -- -j4
 
 echo "✅ Build succeeded."
 
