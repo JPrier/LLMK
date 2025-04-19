@@ -17,12 +17,12 @@ mkdir -p "$PROJECT_ROOT/build"
 cd "$PROJECT_ROOT/build"
 
 # Use toolchain if provided via argument
-if [[ "$1" == "--embedded" ]]; then
+if [[ "$1" == "--stm32" ]]; then
     echo "Configuring project for embedded target..."
-    cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE="$PROJECT_ROOT/arm-gcc-toolchain.cmake" "$PROJECT_ROOT"
+    cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE="$PROJECT_ROOT/arm-gcc-toolchain.cmake" -B build/stm32 "$PROJECT_ROOT"
 else
     echo "Configuring project for native build..."
-    cmake -G Ninja "$PROJECT_ROOT"
+    cmake -G Ninja -DHOST_BUILD=ON -B build/host "$PROJECT_ROOT"
 fi
 
 # Build the project

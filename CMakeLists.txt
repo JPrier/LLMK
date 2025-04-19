@@ -13,6 +13,13 @@ else()
     message(STATUS "No toolchain file detected — configuring for native build")
 endif()
 
+if(HOST_BUILD)
+  add_definitions(-DHOST_BUILD)
+  add_library(gpio_accessor tst/dependency/gpio_accessor_mock.c)
+else()
+  add_library(gpio_accessor src/dependency/gpio_accessor_stm32.c)
+endif()
+
 # ---------------------------------------------------------------------
 # Embedded Build Configuration (STM32)
 # ---------------------------------------------------------------------
@@ -85,7 +92,17 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 # ---------------------------------------------------------------------
 # Executable Target
 # ---------------------------------------------------------------------
-add_executable(${PROJECT_NAME}.elf ${SOURCES})
+# Host build (macOS)
+add_executable(host_tests
+  tst/service/test_main.c
+)
+
+# STM32 build
+add_executable(LLMK.elf
+  src/service/main.c
+  src/system/system_init.c
+  src/logic/matrix_scanner.c
+)
 
 # ---------------------------------------------------------------------
 # Native-only Development Tools (Tests, SCA, Benchmarks)
