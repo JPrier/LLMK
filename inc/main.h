@@ -10,10 +10,6 @@
 extern "C" {
 #endif
 
-/* Includes ------------------------------------------------------------------*/
-#include <stdint.h>
-#include <stddef.h>
-
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 

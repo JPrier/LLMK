@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-
-# ====================================================
-# Build script for LLMK (run from LLMK/scripts/Unix)
-# This script switches to the project root (two directories up),
-# removes any existing build folder, creates a new one,
-# configures CMake with the Ninja generator and the ARM toolchain,
-# and then builds the project.
-# ====================================================
-
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -25,12 +16,18 @@ echo "Creating build folder..."
 mkdir -p "$PROJECT_ROOT/build"
 cd "$PROJECT_ROOT/build"
 
-# Run CMake configuration
-echo "Configuring project with CMake..."
-cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE="$PROJECT_ROOT/arm-gcc-toolchain.cmake" "$PROJECT_ROOT"
+# Use toolchain if provided via argument
+if [[ "$1" == "--embedded" ]]; then
+    echo "Configuring project for embedded target..."
+    cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE="$PROJECT_ROOT/arm-gcc-toolchain.cmake" "$PROJECT_ROOT"
+else
+    echo "Configuring project for native build..."
+    cmake -G Ninja "$PROJECT_ROOT"
+fi
 
 # Build the project
 echo "Building project..."
 cmake --build .
 
 echo "✅ Build succeeded."
+
