@@ -75,6 +75,11 @@ endif()
 # ---------------------------------------------------------------------
 include_directories(
     ${CMAKE_SOURCE_DIR}/inc
+    ${CMAKE_SOURCE_DIR}/inc/system
+    ${CMAKE_SOURCE_DIR}/inc/dependency
+    ${CMAKE_SOURCE_DIR}/inc/data
+    ${CMAKE_SOURCE_DIR}/inc/logic
+    ${CMAKE_SOURCE_DIR}/inc/service
 )
 
 # ---------------------------------------------------------------------
