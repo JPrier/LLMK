@@ -6,11 +6,11 @@ set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
 # Set the cross-compilers
-set(CMAKE_C_COMPILER arm-none-eabi-gcc)
-set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
+set(CMAKE_C_COMPILER arm-none-eabi-gcc CACHE FILEPATH "" FORCE)
+set(CMAKE_CXX_COMPILER arm-none-eabi-g++ CACHE FILEPATH "" FORCE)
 
 # Optionally, set the assembler and other tools
-set(CMAKE_ASM_COMPILER arm-none-eabi-gcc)
+set(CMAKE_ASM_COMPILER arm-none-eabi-gcc CACHE FILEPATH "" FORCE)
 set(CMAKE_AR arm-none-eabi-ar)
 set(CMAKE_OBJCOPY arm-none-eabi-objcopy)
 set(CMAKE_OBJDUMP arm-none-eabi-objdump)

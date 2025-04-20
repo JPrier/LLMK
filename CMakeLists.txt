@@ -55,17 +55,20 @@ if(TARGET_PLATFORM STREQUAL "embedded")
     add_link_options(
         ${CPU_PARAMETERS}
         -Wl,--gc-sections
-        -nostartfiles
         -e Reset_Handler
     )
 
     add_definitions(
         -D${MCU_MODEL}
         -DUSE_HAL_DRIVER
+        -D__ARM_ARCH_PROFILE=\'M\'
     )
 
     # Default size utility (customizable if needed)
     set(CMAKE_SIZE "arm-none-eabi-size")
+
+    set(LDSCRIPT ${CMAKE_SOURCE_DIR}/startup/STM32H723ZGTx_FLASH.ld)
+    add_link_options(-T${LDSCRIPT})
 endif()
 
 # ---------------------------------------------------------------------
@@ -119,10 +122,10 @@ if(HOST_BUILD)
   )
 else()
   add_executable(LLMK.elf
-    src/system/system_init.c
+    startup/startup_stm32h723zgtx.s
+    src/system/system_stm32h7xx.c
     src/service/main.c
     src/dependency/gpio_accessor_stm32.c
-    # everything else
   )
 endif()
 

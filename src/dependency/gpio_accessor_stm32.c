@@ -3,6 +3,7 @@
 
 static void set_row_high_impl(int row) {
     // Use BSRR register
+    row++; // TODO: Used to turn off compiler warning
 }
 
 static int read_col_impl(int col) {
