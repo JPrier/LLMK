@@ -36,7 +36,7 @@ endif()
 # ---------------------------------------------------------------------
 if(TARGET_PLATFORM STREQUAL "embedded")
     set(MCU_FAMILY STM32H7xx)
-    set(MCU_MODEL STM32H723x)
+    set(MCU_MODEL STM32H723xx)
 
     set(CPU_PARAMETERS
         -mcpu=cortex-m7
@@ -88,6 +88,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/inc
   ${CMAKE_SOURCE_DIR}/inc/dependency
   ${CMAKE_SOURCE_DIR}/inc/system
+  ${CMAKE_SOURCE_DIR}/inc/system/CMSIS
   ${CMAKE_SOURCE_DIR}/inc/logic
   ${CMAKE_SOURCE_DIR}/inc/data
   ${CMAKE_SOURCE_DIR}/inc/service

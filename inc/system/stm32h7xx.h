@@ -11,16 +11,16 @@ extern "C" {
 #endif
 
 // Define your specific device here if not already defined
-// Recommended: pass STM32H723x via compiler flags
-#if !defined(STM32H723x)
-#define STM32H723x
+// Recommended: pass STM32H723xx via compiler flags
+#if !defined(STM32H723xx)
+#define STM32H723xx
 #endif
 
 // Include device-specific header
-#if defined(STM32H723x)
-#include "stm32h723x.h"
+#if defined(STM32H723xx)
+#include "stm32h723xx.h"
 #else
-#error "Please define your STM32H7 target device (e.g. STM32H723x)"
+#error "Please define your STM32H7 target device (e.g. STM32H723xx)"
 #endif
 
 // Common types
