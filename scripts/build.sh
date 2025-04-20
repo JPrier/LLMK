@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+trap 'echo -e "\n[💥 Script ended] Press enter to close..."; read' EXIT
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 echo "Project root is: $PROJECT_ROOT"

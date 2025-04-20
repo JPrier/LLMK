@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 
 set -e
-
+trap 'echo -e "\n[💥 Script ended] Press enter to close..."; read' EXIT
 echo "Installing dependencies for LLMK..."
 
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
