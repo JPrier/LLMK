@@ -23,7 +23,7 @@ if [[ "$1" == "--stm32" ]]; then
     BUILD_DIR="$PROJECT_ROOT/build/stm32"
 else
     BUILD_DIR="$PROJECT_ROOT/build/host"
-    if [["$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin"]]; then
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
         # Hint CMake at the right compiler names
         export CC="C:/ProgramData/mingw64/mingw64/bin/gcc"
         export CXX="C:/ProgramData/mingw64/mingw64/bin/g++"

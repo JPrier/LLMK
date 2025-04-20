@@ -67,7 +67,7 @@ if(TARGET_PLATFORM STREQUAL "embedded")
     # Default size utility (customizable if needed)
     set(CMAKE_SIZE "arm-none-eabi-size")
 
-    set(LDSCRIPT ${CMAKE_SOURCE_DIR}/startup/STM32H723ZGTx_FLASH.ld)
+    set(LDSCRIPT ${CMAKE_SOURCE_DIR}/startup/STM32H723ZGTX_FLASH.ld)
     add_link_options(-T${LDSCRIPT})
 endif()
 
