@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 
 set -e
-
+trap 'echo -e "\n[💥 Script ended] Press enter to close..."; read' EXIT
 echo "Installing dependencies for LLMK..."
 
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
@@ -19,7 +19,23 @@ if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; t
         echo "Chocolatey installation complete. You may need to restart the terminal."
     fi
 
-    choco install -y gcc-arm-embedded cmake ninja
+    choco install -y gcc-arm-embedded mingw cmake ninja
+
+    echo "Adding Chocolatey‑installed compilers to PATH…"
+
+    # 1. MinGW (adjust if your package layout differs)
+    MINGW_BIN="C:/ProgramData/mingw64/mingw64/bin"
+    if [ -d "$MINGW_BIN" ]; then
+        export PATH="$MINGW_BIN:$PATH"
+        echo "  → Added MinGW: $MINGW_BIN"
+    fi
+
+    # 2. ARM‑GCC (search for arm‑none‑eabi‑gcc.exe under Chocolatey)
+    ARM_GCC_BIN_DIR=$(find "$ChocolateyInstall"/lib/gcc-arm-embedded* -type f -name arm-none-eabi-gcc.exe -exec dirname {} \;)
+    if [ -n "$ARM_GCC_BIN_DIR" ] && [ -d "$ARM_GCC_BIN_DIR" ]; then
+        export PATH="$ARM_GCC_BIN_DIR:$PATH"
+        echo "  → Added ARM‑GCC: $ARM_GCC_BIN_DIR"
+    fi
 
 else
     echo "Detected Unix-based system..."

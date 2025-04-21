@@ -10,9 +10,6 @@
 extern "C" {
 #endif
 
-/* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
-
 #ifdef __cplusplus
 }
 #endif

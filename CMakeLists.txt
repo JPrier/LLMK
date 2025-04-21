@@ -2,6 +2,17 @@ cmake_minimum_required(VERSION 3.20)
 project(LLMK C ASM)
 
 # ---------------------------------------------------------------------
+# Configurations
+# ---------------------------------------------------------------------
+include(cmake/build_config.cmake)
+
+# Inject into compiler
+add_definitions(
+  -DNUM_ROWS=${NUM_ROWS}
+  -DNUM_COLS=${NUM_COLS}
+)
+
+# ---------------------------------------------------------------------
 # Platform Detection
 # ---------------------------------------------------------------------
 if (CMAKE_TOOLCHAIN_FILE)
@@ -11,6 +22,13 @@ if (CMAKE_TOOLCHAIN_FILE)
 else()
     set(TARGET_PLATFORM native)
     message(STATUS "No toolchain file detected — configuring for native build")
+endif()
+
+if(HOST_BUILD)
+  add_definitions(-DHOST_BUILD)
+  add_library(gpio_accessor tst/dependency/gpio_accessor_mock.c)
+else()
+  add_library(gpio_accessor src/dependency/gpio_accessor_stm32.c)
 endif()
 
 # ---------------------------------------------------------------------
@@ -37,17 +55,20 @@ if(TARGET_PLATFORM STREQUAL "embedded")
     add_link_options(
         ${CPU_PARAMETERS}
         -Wl,--gc-sections
-        -nostartfiles
         -e Reset_Handler
     )
 
     add_definitions(
         -D${MCU_MODEL}
         -DUSE_HAL_DRIVER
+        -D__ARM_ARCH_PROFILE=\'M\'
     )
 
     # Default size utility (customizable if needed)
     set(CMAKE_SIZE "arm-none-eabi-size")
+
+    set(LDSCRIPT ${CMAKE_SOURCE_DIR}/startup/STM32H723ZGTX_FLASH.ld)
+    add_link_options(-T${LDSCRIPT})
 endif()
 
 # ---------------------------------------------------------------------
@@ -67,8 +88,15 @@ endif()
 # Include Directories
 # ---------------------------------------------------------------------
 include_directories(
-    ${CMAKE_SOURCE_DIR}/inc
+  ${CMAKE_SOURCE_DIR}/inc
+  ${CMAKE_SOURCE_DIR}/inc/dependency
+  ${CMAKE_SOURCE_DIR}/inc/system
+  ${CMAKE_SOURCE_DIR}/inc/system/CMSIS
+  ${CMAKE_SOURCE_DIR}/inc/logic
+  ${CMAKE_SOURCE_DIR}/inc/data
+  ${CMAKE_SOURCE_DIR}/inc/service
 )
+
 
 # ---------------------------------------------------------------------
 # Global Preprocessor Defines
@@ -85,7 +113,22 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 # ---------------------------------------------------------------------
 # Executable Target
 # ---------------------------------------------------------------------
-add_executable(${PROJECT_NAME}.elf ${SOURCES})
+if(HOST_BUILD)
+  add_executable(host_tests
+    tst/service/test_main.c
+    tst/dependency/gpio_accessor_mock.c
+    src/logic/matrix_scanner.c
+    # Do NOT include system_init.c or anything that includes STM32 headers
+  )
+else()
+  add_executable(LLMK.elf
+    startup/startup_stm32h723zgtx.s
+    src/system/system_stm32h7xx.c
+    src/service/main.c
+    src/dependency/gpio_accessor_stm32.c
+  )
+endif()
+
 
 # ---------------------------------------------------------------------
 # Native-only Development Tools (Tests, SCA, Benchmarks)
