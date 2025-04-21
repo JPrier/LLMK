@@ -12,11 +12,34 @@ Custom tenkeyless mechanical keyboard optimized for ultra-low latency input on W
 
 ## Project Structure
 - `/src` - Application logic source files
+  - `/service` - Main application logic and entry point
+  - `/system` - System initialization and hardware configuration
+  - `/dependency` - Hardware abstraction implementations
+  - `/logic` - Core keyboard logic algorithms
 - `/inc` - Header files
+  - `/dependency` - Interface definitions for hardware abstraction
+  - `/system` - STM32 system headers and CMSIS
+  - `/logic` - Core algorithm declarations 
+  - `/service` - Service layer declarations
+  - `/data` - Data structure declarations
 - `/drivers` - STM32 HAL drivers and custom low-level drivers
-- `/usb` - USB device stack implementation
+  - `/STM32CubeH7` - STM32CubeH7 drivers (submodule)
 - `/startup` - CMSIS startup files and linker scripts
+- `/scripts` - Installation and utility scripts
+- `/tools` - Development tools and configuration
+- `/tst` - Test files and mocks
+- `/development` - Development documentation
 - `/build` - Compiled output (not tracked in git)
+
+## Submodules
+This project uses Git submodules for external dependencies. After cloning the repository, initialize and update the submodules:
+
+```bash
+git submodule update --init --recursive
+```
+
+The main submodule is:
+- `drivers/STM32CubeH7` - STM32CubeH7 HAL and LL drivers from STMicroelectronics
 
 ## Development Setup
 
@@ -25,10 +48,17 @@ To set up your development environment for building LLMK, follow the steps below
 ### Windows
 
 1. **Install Dependencies:**
-   - Right-click on the `install_dependencies.bat` script and select "Run as administrator" to install the necessary tools.
+   - Navigate to the scripts directory in the repository
+   - Open a command prompt with administrator privileges
+   - Run the installation script:
+     ```cmd
+     cd path\to\LLMK\scripts
+     install_dependencies.bat
+     ```
    - This will install:
      - ARM GCC toolchain
      - CMake (version 3.20+)
+     - Ninja build system
    - You will be prompted if you want to install STM32CubeProgrammer (recommended for flashing)
 
 2. **Build the Firmware:**
@@ -55,15 +85,16 @@ To set up your development environment for building LLMK, follow the steps below
 
 1. **Install Dependencies:**
    - Open Terminal.
-   - Navigate to the repository directory and run the installation script:
+   - Navigate to the repository's scripts directory and run the installation script:
      ```bash
-     cd /path/to/LLMK
+     cd /path/to/LLMK/scripts
      chmod +x install_dependencies.sh
      ./install_dependencies.sh
      ```
    - This will install:
      - ARM GCC toolchain
      - CMake (version 3.20+)
+     - Ninja build system
    - You will be prompted if you want to install OpenOCD (recommended for flashing)
 
 2. **Build the Firmware:**
@@ -89,15 +120,16 @@ To set up your development environment for building LLMK, follow the steps below
 
 1. **Install Dependencies:**
    - Open Terminal.
-   - Navigate to the repository directory and run the installation script:
+   - Navigate to the repository's scripts directory and run the installation script:
      ```bash
-     cd /path/to/LLMK
+     cd /path/to/LLMK/scripts
      chmod +x install_dependencies.sh
      ./install_dependencies.sh
      ```
    - This will install:
      - ARM GCC toolchain
      - CMake (version 3.20+)
+     - Ninja build system
    - You will be prompted if you want to install OpenOCD (recommended for flashing)
 
 2. **Build the Firmware:**
@@ -118,6 +150,59 @@ To set up your development environment for building LLMK, follow the steps below
      ```bash
      make
      ```
+
+## Continuous Integration
+
+The project uses GitHub Actions for continuous integration, providing automated building and static analysis on all pushes to the main branch and pull requests.
+
+### CI Pipeline
+
+The CI pipeline consists of two main jobs:
+
+1. **Build:**
+   - Checks out the repository and its submodules
+   - Installs the ARM GCC toolchain and Ninja build system
+   - Configures the project with CMake
+   - Builds the firmware
+   - Uploads the compiled firmware as artifacts
+
+2. **Static Analysis:**
+   - Runs Cppcheck on the codebase
+   - Uploads the analysis results as artifacts
+
+### Running Static Analysis Locally
+
+You can run the same static analysis tools locally:
+
+```bash
+mkdir -p build
+cd build
+cmake ..
+cmake --build . --target cppcheck
+```
+
+The analysis results will be written to `build/cppcheck-result.xml`.
+
+## Testing
+
+The project includes a test framework for verifying functionality in a native environment (without requiring actual hardware).
+
+### Running Tests
+
+To run the tests:
+
+```bash
+# Configure for native (host) build
+mkdir -p build
+cd build
+cmake .. -DHOST_BUILD=ON
+
+# Build and run tests
+cmake --build . --target host_tests
+./host_tests
+```
+
+The test framework uses mock implementations of hardware-dependent components, allowing the core logic to be tested on a development machine.
 
 ## Flashing the Firmware
 
