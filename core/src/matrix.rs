@@ -22,10 +22,10 @@ where
                 history[idx] = ((history[idx] << 1) | bit) & MASK;
                 let cur = (stable >> idx) & 1;
                 if history[idx] == MASK && cur == 0 {
-                    stable |= 1 << idx;
+                    stable |= 1u64 << idx;
                     handler.key_event(idx, true);
                 } else if history[idx] == 0 && cur == 1 {
-                    stable &= !(1 << idx);
+                    stable &= !(1u64 << idx);
                     handler.key_event(idx, false);
                 }
             }

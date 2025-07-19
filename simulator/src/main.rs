@@ -1,40 +1,51 @@
-use keyboard_core::{self as core, KeyEventHandler, KeyboardHW, Timer};
-use std::time::Instant;
+mod sim_hal;
+mod input_scenario;
 
-struct SimKeyboard;
+use sim_hal::{SimKeyboard, SimTimer};
+use input_scenario::example_scenario;
+use keyboard_core::{KeyboardHW, Timer};
 
-impl KeyboardHW for SimKeyboard {
-    fn init(&mut self) {}
-    fn read_keys(&self) -> u32 {
-        0
-    }
-}
-
-struct PrintHandler;
-
-impl KeyEventHandler for PrintHandler {
-    fn key_event(&mut self, key: usize, pressed: bool) {
-        println!("key {} {}", key, if pressed { "down" } else { "up" });
-    }
-}
-
-struct HostTimer(Instant);
-
-impl HostTimer {
-    fn new() -> Self {
-        HostTimer(Instant::now())
-    }
-}
-
-impl Timer for HostTimer {
-    fn millis(&self) -> u64 {
-        self.0.elapsed().as_millis() as u64
+fn scan_and_process(hw: &mut impl KeyboardHW, time: u64) {
+    let keys = hw.read_keys();
+    if keys != 0 {
+        println!("[{} ms] Keys: {:064b}", time, keys);
     }
 }
 
 fn main() {
-    let mut hw = SimKeyboard;
-    let timer = HostTimer::new();
-    let mut handler = PrintHandler;
-    core::run(&mut hw, &timer, &mut handler);
+    let mut hw = SimKeyboard::new(4, 4);
+    let mut timer = SimTimer::new();
+    let events = example_scenario();
+
+    let max_time = events.iter().map(|e| e.time_ms).max().unwrap_or(0) + 20;
+
+    let mut tick_ms = 0;
+    let mut event_idx = 0;
+
+    while tick_ms <= max_time {
+        while event_idx < events.len() && events[event_idx].time_ms == tick_ms {
+            let ev = &events[event_idx];
+            hw.set_key(ev.row, ev.col, ev.pressed);
+            println!(
+                "[{} ms] Key {}:{} {}",
+                tick_ms,
+                ev.row,
+                ev.col,
+                if ev.pressed { "pressed" } else { "released" }
+            );
+            event_idx += 1;
+        }
+
+        hw.set_all_rows_inactive();
+
+        for row in 0..4 {
+            hw.set_row_active(row);
+            scan_and_process(&mut hw, tick_ms);
+        }
+
+        timer.advance(1);
+        tick_ms += 1;
+    }
+
+    println!("✅ Simulation complete.");
 }

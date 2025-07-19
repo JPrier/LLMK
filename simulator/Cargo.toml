@@ -1,8 +1,9 @@
 [package]
 name = "simulator"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
-keyboard_core = { package = "keyboard-core",  path = "../core", features=["std"] }
+keyboard-core = { path = "../core", default-features = false, features = ["std"] }
+chrono = "0.4"
 
