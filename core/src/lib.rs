@@ -1,8 +1,13 @@
 #![no_std]
 
+#[cfg(test)]
+extern crate std;
+
 /// Type representing the pressed state of up to 32 keys.
 /// Each bit corresponds to a key.
-pub type KeyState = u32;
+/// Type representing the pressed state of up to 64 keys.
+/// Each bit corresponds to a key.
+pub type KeyState = u64;
 
 /// Abstraction over the hardware keyboard interface.  This trait is
 /// implemented by the STM32 firmware as well as the Linux simulator.
@@ -40,6 +45,9 @@ pub trait KeyEventHandler {
 mod direct;
 #[cfg(feature = "matrix-scan")]
 mod matrix;
+
+mod logic;
+pub use logic::KeyboardLogic;
 
 /// Run the active keyboard algorithm.  This function never returns on the
 /// firmware but in the simulator it may exit once the test scenario completes.
