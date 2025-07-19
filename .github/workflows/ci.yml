@@ -7,88 +7,19 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          submodules: recursive
-
-      - name: Show directory structure
-        run: |
-          echo "Current path: $(pwd)"
-          find ${{ github.workspace }} -type f
-
-      - name: Confirm file type and permissions
-        run: |
-          set -eux
-          ls -l "${{ github.workspace }}/src/service/main.c"
-          file "${{ github.workspace }}/src/service/main.c"
-          stat "${{ github.workspace }}/src/service/main.c"
-
-      - name: Check expected source files
-        run: |
-          set -eux
-          echo "Checking main.c..."
-          test -f "${{ github.workspace }}/src/service/main.c" && echo "✓ main.c found"
-          echo "Checking stm32h723xx.h..."
-          test -f "${{ github.workspace }}/inc/system/stm32h723xx.h" && echo "✓ stm32h723xx.h found"
-          echo "Checking toolchain..."
-          test -f "${{ github.workspace }}/arm-gcc-toolchain.cmake" && echo "✓ toolchain found"
-        
-
-      - name: Install Ninja Build
-        run: sudo apt-get update && sudo apt-get install -y ninja-build
-
-      - name: Install ARM GCC Toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi
-
-      - name: Configure CMake
-        run: |
-          set -eux
-          cmake -G "Ninja" -B build -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/arm-gcc-toolchain.cmake" "${{ github.workspace }}"
-
-      - name: Build Project
-        run: |
-          set -eux
-          cmake --build build -- -j4 -v
-
-      - name: Upload Firmware Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware
-          path: |
-            build/*.hex
-            build/*.bin
-            build/*.elf
-
-
-  static-analysis:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-
-      - name: Install Cppcheck
-        run: sudo apt-get update && sudo apt-get install -y cppcheck
-
-      - name: Run Cppcheck
-        run: |
-          mkdir -p build
-          cd build
-          cmake -G "Ninja" ..
-          cmake --build . --target cppcheck
-
-      - name: Upload Analysis Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: static-analysis
-          path: build/cppcheck-result.xml
-
+          toolchain: stable
+          targets: thumbv7em-none-eabihf
+      - name: Cargo check (core)
+        run: cargo check -p keyboard-core
+      - name: Cargo check (firmware)
+        run: cargo check -p firmware --target thumbv7em-none-eabihf
+      - name: Cargo check (simulator)
+        run: cargo check -p simulator
+      - name: Cargo check (bootloader)
+        run: cargo check -p bootloader --target thumbv7em-none-eabihf

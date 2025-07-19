@@ -15,3 +15,5 @@ CMakeFiles/
 
 # Unity test outputs
 tests/*.bin
+
+target/

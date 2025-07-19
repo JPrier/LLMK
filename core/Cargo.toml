@@ -1,0 +1,14 @@
+[package]
+name = "keyboard-core"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+[lib]
+name = "keyboard_core"
+path = "src/lib.rs"
+crate-type = ["rlib"]
+
+[features]
+default = []
+std = []
