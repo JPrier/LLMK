@@ -10,5 +10,7 @@ path = "src/lib.rs"
 crate-type = ["rlib"]
 
 [features]
-default = []
+default = ["direct-keys"]
 std = []
+direct-keys = []
+matrix-scan = []

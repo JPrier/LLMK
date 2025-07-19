@@ -10,3 +10,8 @@ stm32h7 = { version = "0.16", features = ["stm32h723", "rt"] }
 keyboard_core = { package = "keyboard-core", path = "../core" }
 panic-halt = "0.2"
 
+[features]
+default = ["direct-keys"]
+direct-keys = ["keyboard_core/direct-keys"]
+matrix-scan = ["keyboard_core/matrix-scan"]
+
