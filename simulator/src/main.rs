@@ -1,4 +1,4 @@
-use keyboard_core::{self as core, KeyboardHW, Timer};
+use keyboard_core::{self as core, KeyEventHandler, KeyboardHW, Timer};
 use std::time::Instant;
 
 struct SimKeyboard;
@@ -7,6 +7,14 @@ impl KeyboardHW for SimKeyboard {
     fn init(&mut self) {}
     fn read_keys(&self) -> u32 {
         0
+    }
+}
+
+struct PrintHandler;
+
+impl KeyEventHandler for PrintHandler {
+    fn key_event(&mut self, key: usize, pressed: bool) {
+        println!("key {} {}", key, if pressed { "down" } else { "up" });
     }
 }
 
@@ -27,5 +35,6 @@ impl Timer for HostTimer {
 fn main() {
     let mut hw = SimKeyboard;
     let timer = HostTimer::new();
-    core::run(&mut hw, &timer);
+    let mut handler = PrintHandler;
+    core::run(&mut hw, &timer, &mut handler);
 }

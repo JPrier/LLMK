@@ -2,7 +2,7 @@
 #![no_main]
 use cortex_m::peripheral::{Peripherals, SYST};
 use cortex_m_rt::entry;
-use keyboard_core::{self as core, KeyboardHW, Timer};
+use keyboard_core::{self as core, KeyEventHandler, KeyboardHW, Timer};
 use panic_halt as _;
 use stm32h7::stm32h723;
 
@@ -21,6 +21,14 @@ impl Stm32Keyboard {
 struct SysTimer {
     syst: SYST,
     start: u64,
+}
+
+struct EventSink;
+
+impl KeyEventHandler for EventSink {
+    fn key_event(&mut self, _key: usize, _pressed: bool) {
+        // in real firmware this would update USB HID reports
+    }
 }
 
 impl Timer for SysTimer {
@@ -60,7 +68,8 @@ fn main() -> ! {
     syst.clear_current();
     syst.enable_counter();
     let timer = SysTimer { syst, start: 0 };
+    let mut events = EventSink;
 
-    core::run(&mut hw, &timer);
+    core::run(&mut hw, &timer, &mut events);
     loop {}
 }

@@ -29,6 +29,13 @@ pub trait Timer {
     fn millis(&self) -> u64;
 }
 
+/// Handler for debounced key events. `pressed` is true for a key down event
+/// and false for a release. The `key` index corresponds to the bit position in
+/// `KeyState`.
+pub trait KeyEventHandler {
+    fn key_event(&mut self, key: usize, pressed: bool);
+}
+
 #[cfg(feature = "direct-keys")]
 mod direct;
 #[cfg(feature = "matrix-scan")]
@@ -36,12 +43,17 @@ mod matrix;
 
 /// Run the active keyboard algorithm.  This function never returns on the
 /// firmware but in the simulator it may exit once the test scenario completes.
-pub fn run<H: KeyboardHW, T: Timer>(hw: &mut H, timer: &T) {
+pub fn run<H, T, E>(hw: &mut H, timer: &T, handler: &mut E)
+where
+    H: KeyboardHW,
+    T: Timer,
+    E: KeyEventHandler,
+{
     hw.init();
 
     #[cfg(feature = "matrix-scan")]
-    matrix::process(hw, timer);
+    matrix::process(hw, timer, handler);
 
     #[cfg(feature = "direct-keys")]
-    direct::process(hw, timer);
+    direct::process(hw, timer, handler);
 }
