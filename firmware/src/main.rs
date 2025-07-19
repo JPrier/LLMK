@@ -51,9 +51,9 @@ impl KeyboardHW for Stm32Keyboard {
         self.gpio.pupdr().modify(|_, w| w.pupdr13().pull_up());
     }
 
-    fn read_keys(&self) -> u32 {
+    fn read_keys(&self) -> u64 {
         let idr = self.gpio.idr().read().bits();
-        (!idr >> 13) & 1
+        ((!idr >> 13) & 1) as u64
     }
 }
 
