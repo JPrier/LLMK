@@ -1,0 +1,12 @@
+[package]
+name = "firmware"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+cortex-m = "0.7"
+cortex-m-rt = "0.7"
+stm32h7 = { version = "0.16", features = ["stm32h723", "rt"] }
+keyboard_core = { package = "keyboard-core", path = "../core" }
+panic-halt = "0.2"
+
