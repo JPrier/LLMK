@@ -1,14 +1,31 @@
-use crate::{KeyboardHW, Timer};
+use crate::{KeyEventHandler, KeyState, KeyboardHW, Timer};
 
-pub fn process<H: KeyboardHW, T: Timer>(hw: &mut H, timer: &T) {
-    let mut last = hw.read_keys();
+const NUM_KEYS: usize = 32;
+const DEBOUNCE_BITS: u8 = 5;
+const MASK: u16 = (1 << DEBOUNCE_BITS) - 1;
+
+pub fn process<H, T, E>(hw: &mut H, timer: &T, handler: &mut E)
+where
+    H: KeyboardHW,
+    T: Timer,
+    E: KeyEventHandler,
+{
+    let mut history = [0u16; NUM_KEYS];
+    let mut stable: KeyState = hw.read_keys();
     loop {
-        let now = timer.millis();
-        let state = hw.read_keys();
-        if state != last {
-            // placeholder for event handling in firmware/sim
-            last = state;
+        let raw = hw.read_keys();
+        for i in 0..NUM_KEYS {
+            let bit = ((raw >> i) & 1) as u16;
+            history[i] = ((history[i] << 1) | bit) & MASK;
+            let cur = (stable >> i) & 1;
+            if history[i] == MASK && cur == 0 {
+                stable |= 1 << i;
+                handler.key_event(i, true);
+            } else if history[i] == 0 && cur == 1 {
+                stable &= !(1 << i);
+                handler.key_event(i, false);
+            }
         }
-        let _ = now; // suppress unused variable
+        let _ = timer.millis();
     }
 }
