@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "core",
+    "firmware",
+    "simulator",
+    "bootloader"
+]
+resolver = "2"
+[profile.release]
+codegen-units = 1
+lto = true
+panic = "abort"
