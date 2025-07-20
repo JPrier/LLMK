@@ -10,7 +10,10 @@ path = "src/lib.rs"
 crate-type = ["rlib"]
 
 [features]
-default = ["direct-keys"]
+default = ["direct-keys", "time-debounce"]
 std = []
 direct-keys = []
 matrix-scan = []
+no-debounce = []
+time-debounce = []
+mask-debounce = []

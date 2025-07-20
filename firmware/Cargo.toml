@@ -14,4 +14,7 @@ panic-halt = "0.2"
 default = ["direct-keys"]
 direct-keys = ["keyboard_core/direct-keys"]
 matrix-scan = ["keyboard_core/matrix-scan"]
+no-debounce = ["keyboard_core/no-debounce"]
+time-debounce = ["keyboard_core/time-debounce"]
+mask-debounce = ["keyboard_core/mask-debounce"]
 
