@@ -1,4 +1,7 @@
 use crate::{ActiveDebouncer, Debouncer, KeyEventHandler, KeyboardHW, Timer};
+
+#[cfg(not(any(feature = "no-debounce", feature = "time-debounce", feature = "mask-debounce")))]
+compile_error!("A debounce implementation feature must be enabled");
 const NUM_ROWS: usize = 4;
 const NUM_COLS: usize = 8;
 const NUM_KEYS: usize = NUM_ROWS * NUM_COLS;

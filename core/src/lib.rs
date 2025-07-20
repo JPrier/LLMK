@@ -10,7 +10,9 @@ extern crate std;
 pub type KeyState = u64;
 
 pub mod debounce;
-pub use debounce::{ActiveDebouncer, Debouncer, MaskDebounce, NoDebounce, TimeDebounce};
+pub use debounce::{Debouncer, MaskDebounce, NoDebounce, TimeDebounce};
+#[cfg(any(feature = "no-debounce", feature = "time-debounce", feature = "mask-debounce"))]
+pub use debounce::ActiveDebouncer;
 
 /// Abstraction over the hardware keyboard interface.  This trait is
 /// implemented by the STM32 firmware as well as the Linux simulator.
