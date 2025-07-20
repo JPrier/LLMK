@@ -7,3 +7,8 @@ edition = "2021"
 keyboard-core = { path = "../core", default-features = false, features = ["std"] }
 chrono = "0.4"
 
+[features]
+no-debounce = ["keyboard-core/no-debounce"]
+time-debounce = ["keyboard-core/time-debounce"]
+mask-debounce = ["keyboard-core/mask-debounce"]
+
