@@ -11,6 +11,12 @@ pub struct KeyboardLogic {
     stable: KeyState,
 }
 
+impl Default for KeyboardLogic {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl KeyboardLogic {
     pub fn new() -> Self {
         Self {

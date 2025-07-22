@@ -3,16 +3,14 @@ use keyboard_core::{KeyboardHW, Timer};
 pub struct SimKeyboard {
     pub keys: u64,
     pub active_row: Option<usize>,
-    pub num_rows: usize,
     pub num_cols: usize,
 }
 
 impl SimKeyboard {
-    pub fn new(rows: usize, cols: usize) -> Self {
+    pub fn new(_rows: usize, cols: usize) -> Self {
         SimKeyboard {
             keys: 0,
             active_row: None,
-            num_rows: rows,
             num_cols: cols,
         }
     }
