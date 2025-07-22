@@ -3,7 +3,7 @@ mod input_scenario;
 
 use sim_hal::{SimKeyboard, SimTimer};
 use input_scenario::example_scenario;
-use keyboard_core::{KeyboardHW, Timer};
+use keyboard_core::KeyboardHW;
 
 fn scan_and_process(hw: &mut impl KeyboardHW, time: u64) {
     let keys = hw.read_keys();

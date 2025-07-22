@@ -1,4 +1,4 @@
-use crate::{KeyboardHW, Timer, KeyEventHandler, KeyState};
+use crate::{KeyEventHandler, KeyState, KeyboardHW, Timer};
 
 const NUM_ROWS: usize = 4;
 const NUM_COLS: usize = 8;
@@ -44,5 +44,11 @@ impl KeyboardLogic {
         }
         hw.set_all_rows_inactive();
         let _ = timer.millis();
+    }
+}
+
+impl Default for KeyboardLogic {
+    fn default() -> Self {
+        Self::new()
     }
 }
