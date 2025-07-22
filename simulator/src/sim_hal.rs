@@ -18,6 +18,7 @@ impl SimKeyboard {
     }
 
     pub fn set_key(&mut self, row: usize, col: usize, pressed: bool) {
+        assert!(row < self.num_rows && col < self.num_cols);
         let bit_index = row * self.num_cols + col;
         if pressed {
             self.keys |= 1 << bit_index;
@@ -52,6 +53,7 @@ impl KeyboardHW for SimKeyboard {
     }
 
     fn set_row_active(&mut self, row: usize) {
+        assert!(row < self.num_rows);
         self.active_row = Some(row);
     }
 
