@@ -2,6 +2,7 @@
 #![no_main]
 use cortex_m::asm;
 use cortex_m_rt::entry;
+#[cfg(not(test))]
 use panic_halt as _;
 use stm32h7::stm32h723;
 
@@ -23,5 +24,7 @@ fn main() -> ! {
     }
 
     // Stay in bootloader (update mode)
-    loop {}
+    loop {
+        cortex_m::asm::wfi();
+    }
 }

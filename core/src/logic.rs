@@ -6,6 +6,7 @@ const NUM_KEYS: usize = NUM_ROWS * NUM_COLS;
 const DEBOUNCE_BITS: u8 = 5;
 const MASK: u16 = (1 << DEBOUNCE_BITS) - 1;
 
+#[derive(Default)]
 pub struct KeyboardLogic {
     history: [u16; NUM_KEYS],
     stable: KeyState,

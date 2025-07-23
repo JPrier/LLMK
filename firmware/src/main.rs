@@ -3,6 +3,7 @@
 use cortex_m::peripheral::{Peripherals, SYST};
 use cortex_m_rt::entry;
 use keyboard_core::{self as core, KeyEventHandler, KeyboardHW, Timer};
+#[cfg(not(test))]
 use panic_halt as _;
 use stm32h7::stm32h723;
 
@@ -20,7 +21,6 @@ impl Stm32Keyboard {
 
 struct SysTimer {
     syst: SYST,
-    start: u64,
 }
 
 struct EventSink;
@@ -67,9 +67,11 @@ fn main() -> ! {
     syst.set_reload(SYSCLK_HZ / 1000);
     syst.clear_current();
     syst.enable_counter();
-    let timer = SysTimer { syst, start: 0 };
+    let timer = SysTimer { syst };
     let mut events = EventSink;
 
     core::run(&mut hw, &timer, &mut events);
-    loop {}
+    loop {
+        cortex_m::asm::nop();
+    }
 }
