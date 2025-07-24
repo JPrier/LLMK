@@ -1,6 +1,10 @@
 use crate::{ActiveDebouncer, Debouncer, KeyEventHandler, KeyboardHW, Timer};
 
-#[cfg(not(any(feature = "no-debounce", feature = "time-debounce", feature = "mask-debounce")))]
+#[cfg(not(any(
+    feature = "no-debounce",
+    feature = "time-debounce",
+    feature = "mask-debounce"
+)))]
 compile_error!("A debounce implementation feature must be enabled");
 
 const NUM_KEYS: usize = 32;

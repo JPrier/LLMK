@@ -1,4 +1,4 @@
-use crate::{KeyboardHW, Timer, KeyEventHandler, KeyState};
+use crate::{KeyEventHandler, KeyState, KeyboardHW, Timer};
 
 const NUM_ROWS: usize = 4;
 const NUM_COLS: usize = 8;

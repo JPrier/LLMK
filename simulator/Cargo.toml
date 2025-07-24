@@ -12,3 +12,6 @@ no-debounce = ["keyboard-core/no-debounce"]
 time-debounce = ["keyboard-core/time-debounce"]
 mask-debounce = ["keyboard-core/mask-debounce"]
 
+[dev-dependencies]
+cargo-tarpaulin = "0.32"
+

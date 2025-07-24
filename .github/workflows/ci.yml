@@ -7,19 +7,33 @@ on:
     branches: [ main ]
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: default
+            features: ''
+          - name: debounce-polling
+            features: '--features debounce,polling'
+          - name: debounce-interrupt
+            features: '--features debounce,interrupt'
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-          targets: thumbv7em-none-eabihf
-      - name: Cargo check (core)
-        run: cargo check -p keyboard-core
-      - name: Cargo check (firmware)
-        run: cargo check -p firmware --target thumbv7em-none-eabihf
-      - name: Cargo check (simulator)
-        run: cargo check -p simulator
-      - name: Cargo check (bootloader)
-        run: cargo check -p bootloader --target thumbv7em-none-eabihf
+      - name: Install Tarpaulin
+        run: cargo install cargo-tarpaulin
+      - name: Cargo fmt
+        run: cargo fmt --all --check
+      - name: Cargo clippy
+        run: cargo clippy ${{ matrix.features }} -- -D warnings
+      - name: Cargo test
+        run: cargo test ${{ matrix.features }}
+      - name: Coverage
+        run: cargo tarpaulin ${{ matrix.features }} --out Xml
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./tarpaulin-report.xml

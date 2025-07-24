@@ -1,9 +1,9 @@
-mod sim_hal;
 mod input_scenario;
+mod sim_hal;
 
-use sim_hal::{SimKeyboard, SimTimer};
 use input_scenario::example_scenario;
 use keyboard_core::{KeyboardHW, Timer};
+use sim_hal::{SimKeyboard, SimTimer};
 
 fn scan_and_process(hw: &mut impl KeyboardHW, time: u64) {
     let keys = hw.read_keys();

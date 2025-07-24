@@ -1,0 +1,19 @@
+name: Firmware Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+          targets: thumbv7em-none-eabihf
+      - name: Build firmware
+        run: cargo build -p firmware --release --target=thumbv7em-none-eabihf
