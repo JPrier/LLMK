@@ -12,6 +12,9 @@ struct Stm32Keyboard {
     gpio: stm32h723::GPIOC,
 }
 
+const _ROW_PINS: [usize; 4] = [0, 1, 2, 3];
+const _COL_PINS: [usize; 8] = [4, 5, 6, 7, 8, 9, 10, 11];
+
 impl Stm32Keyboard {
     fn new(dp: stm32h723::Peripherals) -> Self {
         Stm32Keyboard { gpio: dp.GPIOC }
@@ -46,14 +49,62 @@ impl KeyboardHW for Stm32Keyboard {
         let rcc = unsafe { &(*stm32h723::RCC::ptr()) };
         rcc.ahb4enr().modify(|_, w| w.gpiocen().set_bit());
 
-        // configure PC13 as input with pull-up as an example
-        self.gpio.moder().modify(|_, w| w.moder13().input());
-        self.gpio.pupdr().modify(|_, w| w.pupdr13().pull_up());
+        // rows as outputs
+        self.gpio.moder().modify(|_, w| {
+            w.moder0().output();
+            w.moder1().output();
+            w.moder2().output();
+            w.moder3().output()
+        });
+        // columns as inputs with pull-ups
+        self.gpio.moder().modify(|_, w| {
+            w.moder4().input();
+            w.moder5().input();
+            w.moder6().input();
+            w.moder7().input();
+            w.moder8().input();
+            w.moder9().input();
+            w.moder10().input();
+            w.moder11().input()
+        });
+        self.gpio.pupdr().modify(|_, w| {
+            w.pupdr4().pull_up();
+            w.pupdr5().pull_up();
+            w.pupdr6().pull_up();
+            w.pupdr7().pull_up();
+            w.pupdr8().pull_up();
+            w.pupdr9().pull_up();
+            w.pupdr10().pull_up();
+            w.pupdr11().pull_up();
+            w.pupdr0().floating();
+            w.pupdr1().floating();
+            w.pupdr2().floating();
+            w.pupdr3().floating()
+        });
+
+        self.set_all_rows_inactive();
     }
 
     fn read_keys(&self) -> u64 {
         let idr = self.gpio.idr().read().bits();
-        ((!idr >> 13) & 1) as u64
+        ((!idr >> 4) & 0xff) as u64
+    }
+
+    fn set_row_active(&mut self, row: usize) {
+        self.set_all_rows_inactive();
+        match row {
+            0 => { self.gpio.bsrr().write(|w| w.br0().reset()); }
+            1 => { self.gpio.bsrr().write(|w| w.br1().reset()); }
+            2 => { self.gpio.bsrr().write(|w| w.br2().reset()); }
+            3 => { self.gpio.bsrr().write(|w| w.br3().reset()); }
+            _ => {}
+        }
+    }
+
+    fn set_all_rows_inactive(&mut self) {
+        self.gpio
+            .bsrr()
+            .write(|w| w.bs0().set_().bs1().set_().bs2().set_().bs3().set_());
     }
 }
 
