@@ -1,5 +1,4 @@
-use crate::{SimEventHandler, SimKeyboard, SimTimer};
-use crate::input_scenario::KeyEvent;
+use crate::{SimEventHandler, SimKeyboard, SimTimer, KeyEvent};
 use keyboard_core::{KeyboardHW, KeyEventHandler, Timer, NoDebounce, TimeDebounce, MaskDebounce, Debouncer};
 
 #[derive(Debug, Clone)]

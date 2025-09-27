@@ -1,4 +1,4 @@
-use crate::input_scenario::KeyEvent;
+use crate::KeyEvent;
 
 pub fn rapid_fire_scenario() -> Vec<KeyEvent> {
     let mut events = Vec::new();
@@ -75,7 +75,7 @@ pub fn get_scenario_by_name(name: &str) -> Option<Vec<KeyEvent>> {
         "bouncy" => Some(bouncy_key_scenario()),
         "long_press" => Some(long_press_scenario()),
         "all_keys" => Some(all_keys_scenario()),
-        "example" => Some(crate::input_scenario::example_scenario()),
+        "example" => Some(crate::example_scenario()),
         _ => None,
     }
 }
