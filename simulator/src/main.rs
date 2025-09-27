@@ -3,10 +3,11 @@ mod input_scenario;
 mod test_scenarios;
 mod benchmark;
 mod integration_tests;
+mod core_integration;
 
 use sim_hal::{SimKeyboard, SimTimer};
 use input_scenario::{example_scenario, KeyEvent};
-use keyboard_core::{KeyboardHW, KeyEventHandler};
+use keyboard_core::{KeyboardHW, KeyEventHandler, Timer, NoDebounce, TimeDebounce, MaskDebounce, Debouncer};
 use std::env;
 
 pub struct SimEventHandler {
@@ -151,41 +152,35 @@ fn run_integration_tests_cmd() {
 fn run_enhanced_simulator(events: Vec<KeyEvent>, scenario_name: &str, debounce_alg: &str) {
     let mut hw = SimKeyboard::new(4, 4);
     let mut timer = SimTimer::new();
-    let handler = SimEventHandler::new();
+    let mut handler = SimEventHandler::new();
 
     println!("Starting enhanced simulation: {} with {}", scenario_name, debounce_alg);
     
     let max_time = events.iter().map(|e| e.time_ms).max().unwrap_or(0) + 20;
-    let mut tick_ms = 0;
     let mut event_idx = 0;
 
-    while tick_ms <= max_time {
-        // Apply input events
-        while event_idx < events.len() && events[event_idx].time_ms == tick_ms {
-            let ev = &events[event_idx];
-            hw.set_key(ev.row, ev.col, ev.pressed);
-            println!(
-                "[{} ms] Key {}:{} {}",
-                tick_ms,
-                ev.row,
-                ev.col,
-                if ev.pressed { "pressed" } else { "released" }
-            );
-            event_idx += 1;
+    // Process simulation using the real debounce logic
+    match debounce_alg {
+        "no-debounce" => {
+            let mut debouncer = NoDebounce::new();
+            run_enhanced_simulation_with_debouncer(&mut hw, &mut timer, &mut handler, &mut debouncer,
+                                                 &events, max_time, &mut event_idx);
+        },
+        "time-debounce" => {
+            let mut debouncer = TimeDebounce::default();
+            run_enhanced_simulation_with_debouncer(&mut hw, &mut timer, &mut handler, &mut debouncer,
+                                                 &events, max_time, &mut event_idx);
+        },
+        "mask-debounce" => {
+            let mut debouncer = MaskDebounce::default();
+            run_enhanced_simulation_with_debouncer(&mut hw, &mut timer, &mut handler, &mut debouncer,
+                                                 &events, max_time, &mut event_idx);
+        },
+        _ => {
+            let mut debouncer = NoDebounce::new();
+            run_enhanced_simulation_with_debouncer(&mut hw, &mut timer, &mut handler, &mut debouncer,
+                                                 &events, max_time, &mut event_idx);
         }
-
-        // Simulate matrix scanning with improved output
-        hw.set_all_rows_inactive();
-        for row in 0..4 {
-            hw.set_row_active(row);
-            let keys = hw.read_keys();
-            if keys != 0 {
-                println!("[{} ms] Row {} scan: {:016b}", tick_ms, row, keys);
-            }
-        }
-
-        timer.advance(1);
-        tick_ms += 1;
     }
 
     println!("✅ Enhanced simulation complete.");
@@ -196,6 +191,74 @@ fn run_enhanced_simulator(events: Vec<KeyEvent>, scenario_name: &str, debounce_a
         for (timestamp, key, pressed) in handler.get_last_events(10) {
             println!("  [{}] Key {} {}", timestamp, key, if *pressed { "↓" } else { "↑" });
         }
+    }
+}
+
+fn run_enhanced_simulation_with_debouncer<D>(
+    hw: &mut SimKeyboard,
+    timer: &mut SimTimer,
+    handler: &mut SimEventHandler,
+    debouncer: &mut D,
+    events: &[KeyEvent],
+    max_time: u64,
+    event_idx: &mut usize,
+) where
+    D: Debouncer,
+{
+    const NUM_ROWS: usize = 4;
+    const NUM_COLS: usize = 8; 
+    const NUM_KEYS: usize = NUM_ROWS * NUM_COLS;
+
+    let mut tick_ms = 0;
+
+    while tick_ms <= max_time {
+        // Apply input events
+        while *event_idx < events.len() && events[*event_idx].time_ms == tick_ms {
+            let ev = &events[*event_idx];
+            hw.set_key(ev.row, ev.col, ev.pressed);
+            println!(
+                "[{} ms] Key {}:{} {}",
+                tick_ms,
+                ev.row,
+                ev.col,
+                if ev.pressed { "pressed" } else { "released" }
+            );
+            *event_idx += 1;
+        }
+
+        // Matrix scanning with real debounce logic
+        let mut raw_state = 0u64;
+        for row in 0..NUM_ROWS {
+            hw.set_row_active(row);
+            let val = hw.read_keys();
+            if val != 0 {
+                println!("[{} ms] Row {} scan: {:016b}", tick_ms, row, val);
+            }
+            for col in 0..NUM_COLS {
+                if (val >> col) & 1 != 0 {
+                    let idx = row * NUM_COLS + col;
+                    raw_state |= 1u64 << idx;
+                }
+            }
+        }
+        hw.set_all_rows_inactive();
+
+        // Debounce processing
+        let (_, pressed, released) = debouncer.update(raw_state, timer.millis());
+        
+        // Generate key events
+        for i in 0..NUM_KEYS {
+            let mask = 1u64 << i;
+            if pressed & mask != 0 {
+                handler.key_event(i, true);
+            }
+            if released & mask != 0 {
+                handler.key_event(i, false);
+            }
+        }
+        
+        timer.advance(1);
+        tick_ms += 1;
     }
 }
 

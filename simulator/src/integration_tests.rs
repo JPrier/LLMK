@@ -1,6 +1,6 @@
 use crate::{SimEventHandler, SimKeyboard, SimTimer};
 use crate::input_scenario::KeyEvent;
-use keyboard_core::KeyboardHW;
+use keyboard_core::{KeyboardHW, KeyEventHandler, Timer, NoDebounce, TimeDebounce, MaskDebounce, Debouncer};
 
 #[derive(Debug, Clone)]
 pub struct TestCase {
@@ -103,19 +103,17 @@ pub fn create_debounce_tests() -> Vec<TestCase> {
     ]
 }
 
-pub fn run_integration_test(test_case: &TestCase, _debounce_algorithm: &str) -> TestResult {
+pub fn run_integration_test(test_case: &TestCase, debounce_algorithm: &str) -> TestResult {
     let mut hw = SimKeyboard::new(4, 4);
     let mut timer = SimTimer::new();
-    let handler = SimEventHandler::new();
+    let mut handler = SimEventHandler::new();
 
     let max_time = test_case.input_events.iter().map(|e| e.time_ms).max().unwrap_or(0) + 50;
     
-    let mut tick_ms = 0;
     let mut event_idx = 0;
 
-    // Run the simulation
-    while tick_ms <= max_time {
-        // Apply input events
+    // Apply all input events upfront (they're time-based)
+    for tick_ms in 0..=max_time {
         while event_idx < test_case.input_events.len() 
             && test_case.input_events[event_idx].time_ms == tick_ms {
             let ev = &test_case.input_events[event_idx];
@@ -123,34 +121,46 @@ pub fn run_integration_test(test_case: &TestCase, _debounce_algorithm: &str) -> 
             event_idx += 1;
         }
 
-        // Process matrix scan
-        hw.set_all_rows_inactive();
-        for row in 0..4 {
-            hw.set_row_active(row);
-            let _keys = hw.read_keys();
-            
-            // For now, we simulate the debounce logic
-            // In a complete implementation, this would call keyboard_core::run()
+        // Process one tick with the real debounce algorithm
+        match debounce_algorithm {
+            "no-debounce" => {
+                let mut debouncer = NoDebounce::new();
+                run_one_simulation_step(&mut hw, &mut timer, &mut handler, &mut debouncer);
+            },
+            "time-debounce" => {
+                let mut debouncer = TimeDebounce::default();
+                run_one_simulation_step(&mut hw, &mut timer, &mut handler, &mut debouncer);
+            },
+            "mask-debounce" => {
+                let mut debouncer = MaskDebounce::default();
+                run_one_simulation_step(&mut hw, &mut timer, &mut handler, &mut debouncer);
+            },
+            _ => {
+                let mut debouncer = NoDebounce::new();
+                run_one_simulation_step(&mut hw, &mut timer, &mut handler, &mut debouncer);
+            }
         }
         
         timer.advance(1);
-        tick_ms += 1;
     }
 
-    // For now, we'll simulate expected behavior since we're not yet calling
-    // the full core logic. This is a placeholder that needs the actual 
-    // keyboard_core integration.
     let actual_events: Vec<(usize, bool)> = handler.events.iter()
         .map(|(_, key, pressed)| (*key, *pressed))
         .collect();
 
-    // Simple comparison - in reality this would be more sophisticated
-    let passed = actual_events.len() == test_case.expected_outputs.len();
+    // Check if we got the expected number of events and they match
+    let passed = actual_events.len() == test_case.expected_outputs.len() &&
+        actual_events.iter().zip(test_case.expected_outputs.iter())
+            .all(|((actual_key, actual_pressed), (expected_key, expected_pressed))| {
+                actual_key == expected_key && actual_pressed == expected_pressed
+            });
     
     let message = if passed {
         "Test passed".to_string()
-    } else {
+    } else if actual_events.len() != test_case.expected_outputs.len() {
         format!("Expected {} events, got {}", test_case.expected_outputs.len(), actual_events.len())
+    } else {
+        "Event mismatch".to_string()
     };
 
     TestResult {
@@ -159,6 +169,47 @@ pub fn run_integration_test(test_case: &TestCase, _debounce_algorithm: &str) -> 
         message,
         actual_events,
         expected_events: test_case.expected_outputs.clone(),
+    }
+}
+
+fn run_one_simulation_step<D>(
+    hw: &mut SimKeyboard,
+    timer: &mut SimTimer,
+    handler: &mut SimEventHandler,
+    debouncer: &mut D,
+) where
+    D: Debouncer,
+{
+    const NUM_ROWS: usize = 4;
+    const NUM_COLS: usize = 8; 
+    const NUM_KEYS: usize = NUM_ROWS * NUM_COLS;
+    
+    // Matrix scanning
+    let mut raw_state = 0u64;
+    for row in 0..NUM_ROWS {
+        hw.set_row_active(row);
+        let val = hw.read_keys();
+        for col in 0..NUM_COLS {
+            if (val >> col) & 1 != 0 {
+                let idx = row * NUM_COLS + col;
+                raw_state |= 1u64 << idx;
+            }
+        }
+    }
+    hw.set_all_rows_inactive();
+
+    // Debounce processing
+    let (_, pressed, released) = debouncer.update(raw_state, timer.millis());
+    
+    // Generate key events
+    for i in 0..NUM_KEYS {
+        let mask = 1u64 << i;
+        if pressed & mask != 0 {
+            handler.key_event(i, true);
+        }
+        if released & mask != 0 {
+            handler.key_event(i, false);
+        }
     }
 }
 

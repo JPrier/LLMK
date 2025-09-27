@@ -1,6 +1,6 @@
 use crate::{SimEventHandler, SimKeyboard, SimTimer};
 use crate::input_scenario::KeyEvent;
-use keyboard_core::KeyboardHW;
+use keyboard_core::{KeyboardHW, KeyEventHandler, Timer, NoDebounce, TimeDebounce, MaskDebounce, Debouncer};
 use std::time::Instant;
 
 pub struct BenchmarkResults {
@@ -38,41 +38,34 @@ pub fn benchmark_scenario(
     
     let mut hw = SimKeyboard::new(4, 4);
     let mut timer = SimTimer::new();
-    let handler = SimEventHandler::new();
+    let mut handler = SimEventHandler::new();
     let mut latencies = Vec::new();
 
     let max_time = events.iter().map(|e| e.time_ms).max().unwrap_or(0) + 20;
-    
-    let mut tick_ms = 0;
-    let mut event_idx = 0;
     let events_processed = events.len();
 
-    while tick_ms <= max_time {
-        // Apply input events
-        while event_idx < events.len() && events[event_idx].time_ms == tick_ms {
-            let ev = &events[event_idx];
-            hw.set_key(ev.row, ev.col, ev.pressed);
-            event_idx += 1;
+    // Create the appropriate debouncer
+    match debounce_algorithm.as_str() {
+        "no-debounce" => {
+            let mut debouncer = NoDebounce::new();
+            run_benchmark_with_debouncer(&mut hw, &mut timer, &mut handler, &mut debouncer, 
+                                       &events, max_time, &mut latencies);
+        },
+        "time-debounce" => {
+            let mut debouncer = TimeDebounce::default();
+            run_benchmark_with_debouncer(&mut hw, &mut timer, &mut handler, &mut debouncer, 
+                                       &events, max_time, &mut latencies);
+        },
+        "mask-debounce" => {
+            let mut debouncer = MaskDebounce::default();
+            run_benchmark_with_debouncer(&mut hw, &mut timer, &mut handler, &mut debouncer, 
+                                       &events, max_time, &mut latencies);
+        },
+        _ => {
+            let mut debouncer = NoDebounce::new();
+            run_benchmark_with_debouncer(&mut hw, &mut timer, &mut handler, &mut debouncer, 
+                                       &events, max_time, &mut latencies);
         }
-
-        // Measure processing latency
-        let process_start = Instant::now();
-        
-        // Simulate matrix scanning
-        hw.set_all_rows_inactive();
-        for row in 0..4 {
-            hw.set_row_active(row);
-            let _keys = hw.read_keys();
-            
-            // In a real implementation this would call the debounce logic
-            // For now we simulate processing time
-        }
-        
-        let process_duration = process_start.elapsed();
-        latencies.push(process_duration.as_nanos() as u64);
-        
-        timer.advance(1);
-        tick_ms += 1;
     }
 
     let total_duration = start_time.elapsed();
@@ -100,6 +93,71 @@ pub fn benchmark_scenario(
         avg_latency_ns,
         max_latency_ns,
         throughput_events_per_sec: throughput,
+    }
+}
+
+fn run_benchmark_with_debouncer<D>(
+    hw: &mut SimKeyboard,
+    timer: &mut SimTimer,
+    handler: &mut SimEventHandler,
+    debouncer: &mut D,
+    events: &[KeyEvent],
+    max_time: u64,
+    latencies: &mut Vec<u64>,
+) where
+    D: Debouncer,
+{
+    const NUM_ROWS: usize = 4;
+    const NUM_COLS: usize = 8; 
+    const NUM_KEYS: usize = NUM_ROWS * NUM_COLS;
+
+    let mut tick_ms = 0;
+    let mut event_idx = 0;
+
+    while tick_ms <= max_time {
+        // Apply input events
+        while event_idx < events.len() && events[event_idx].time_ms == tick_ms {
+            let ev = &events[event_idx];
+            hw.set_key(ev.row, ev.col, ev.pressed);
+            event_idx += 1;
+        }
+
+        // Measure processing latency
+        let process_start = Instant::now();
+        
+        // Matrix scanning
+        let mut raw_state = 0u64;
+        for row in 0..NUM_ROWS {
+            hw.set_row_active(row);
+            let val = hw.read_keys();
+            for col in 0..NUM_COLS {
+                if (val >> col) & 1 != 0 {
+                    let idx = row * NUM_COLS + col;
+                    raw_state |= 1u64 << idx;
+                }
+            }
+        }
+        hw.set_all_rows_inactive();
+
+        // Debounce processing
+        let (_, pressed, released) = debouncer.update(raw_state, timer.millis());
+        
+        // Generate key events
+        for i in 0..NUM_KEYS {
+            let mask = 1u64 << i;
+            if pressed & mask != 0 {
+                handler.key_event(i, true);
+            }
+            if released & mask != 0 {
+                handler.key_event(i, false);
+            }
+        }
+        
+        let process_duration = process_start.elapsed();
+        latencies.push(process_duration.as_nanos() as u64);
+        
+        timer.advance(1);
+        tick_ms += 1;
     }
 }
 
