@@ -23,3 +23,41 @@ jobs:
         run: cargo check -p simulator
       - name: Cargo check (bootloader)
         run: cargo check -p bootloader --target thumbv7em-none-eabihf
+
+  test-simulator:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        debounce: [no-debounce, time-debounce, mask-debounce]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+      - name: Build simulator with ${{ matrix.debounce }}
+        run: cargo build -p simulator --no-default-features --features ${{ matrix.debounce }},matrix-scan
+      - name: Test simulator scenarios with ${{ matrix.debounce }}
+        run: |
+          echo "Testing example scenario..."
+          cargo run -p simulator --no-default-features --features ${{ matrix.debounce }},matrix-scan -- run example
+          echo "Testing bouncy scenario..."
+          cargo run -p simulator --no-default-features --features ${{ matrix.debounce }},matrix-scan -- run bouncy
+      - name: Run integration tests with ${{ matrix.debounce }}
+        run: cargo run -p simulator --no-default-features --features ${{ matrix.debounce }},matrix-scan -- test
+      - name: Run benchmarks with ${{ matrix.debounce }}
+        run: cargo run -p simulator --no-default-features --features ${{ matrix.debounce }},matrix-scan -- benchmark example
+
+  cross-platform:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+      - name: Test simulator on ${{ matrix.os }}
+        run: cargo run -p simulator --features time-debounce,matrix-scan -- run example
+      - name: Run memory analysis on ${{ matrix.os }}
+        run: cargo run -p simulator --features time-debounce,matrix-scan -- memory

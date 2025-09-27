@@ -1,51 +1,38 @@
-mod sim_hal;
-mod input_scenario;
-
-use sim_hal::{SimKeyboard, SimTimer};
-use input_scenario::example_scenario;
-use keyboard_core::KeyboardHW;
-
-fn scan_and_process(hw: &mut impl KeyboardHW, time: u64) {
-    let keys = hw.read_keys();
-    if keys != 0 {
-        println!("[{} ms] Keys: {:064b}", time, keys);
-    }
-}
+use simulator::*;
 
 fn main() {
-    let mut hw = SimKeyboard::new(4, 4);
-    let mut timer = SimTimer::new();
-    let events = example_scenario();
-
-    let max_time = events.iter().map(|e| e.time_ms).max().unwrap_or(0) + 20;
-
-    let mut tick_ms = 0;
-    let mut event_idx = 0;
-
-    while tick_ms <= max_time {
-        while event_idx < events.len() && events[event_idx].time_ms == tick_ms {
-            let ev = &events[event_idx];
-            hw.set_key(ev.row, ev.col, ev.pressed);
-            println!(
-                "[{} ms] Key {}:{} {}",
-                tick_ms,
-                ev.row,
-                ev.col,
-                if ev.pressed { "pressed" } else { "released" }
-            );
-            event_idx += 1;
-        }
-
-        hw.set_all_rows_inactive();
-
-        for row in 0..4 {
-            hw.set_row_active(row);
-            scan_and_process(&mut hw, tick_ms);
-        }
-
-        timer.advance(1);
-        tick_ms += 1;
+    let args: Vec<String> = env::args().collect();
+    
+    if args.len() < 2 {
+        print_usage();
+        return;
     }
-
-    println!("✅ Simulation complete.");
+    
+    match args[1].as_str() {
+        "run" => {
+            let default_scenario = "example".to_string();
+            let scenario_name = args.get(2).unwrap_or(&default_scenario);
+            run_simulator_with_scenario(scenario_name);
+        },
+        "benchmark" => {
+            let scenario_filter = args.get(2);
+            run_benchmarks_cmd(scenario_filter);
+        },
+        "test" => {
+            run_integration_tests_cmd();
+        },
+        "list-scenarios" => {
+            list_scenarios_cmd();
+        },
+        "memory" => {
+            benchmark::benchmark_memory_usage();
+        },
+        "legacy" => {
+            run_legacy_simulator();
+        },
+        _ => {
+            println!("Unknown command: {}", args[1]);
+            print_usage();
+        }
+    }
 }

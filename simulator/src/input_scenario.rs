@@ -1,3 +1,4 @@
+#[derive(Debug, Clone)]
 pub struct KeyEvent {
     pub time_ms: u64,
     pub row: usize,
